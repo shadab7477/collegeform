@@ -54,7 +54,6 @@ app.options("*", cors());
 
 
 // Handle OPTIONS preflight requests explicitly (important for complex requests)
-app.options("*", cors(corsOptions));
 
 
 app.use(bodyParser.json());
