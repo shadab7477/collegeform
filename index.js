@@ -25,18 +25,31 @@ const app = express();
 
 
 
-// CORS Configuration
-const corsOptions = {
-  origin: [
-    "http://localhost:3036", // Your frontend during development
-    "https://collegeforms.in/", // Your frontend during development
 
-    "https://collegeform-production.up.railway.app" // Railway backend URL
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true, // Allows cookies and credentials
-  optionsSuccessStatus: 200, // Ensures success for older browsers
-};
+
+
+
+
+const allowedOrigins = [
+  "http://localhost:3000",        // Development
+  "https://collegeforms.in",    
+    "https://collegeform-production.up.railway.app"
+    //  // Railway backend URL
+  //   // Production frontend (Hostinger)
+];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true); // Allow requests
+      } else {
+        callback(new Error("Not allowed by CORS")); // Block others
+      }
+    },
+    credentials: true, // If using cookies or authentication headers
+  })
+);
 
 app.use(cors(corsOptions));
 
