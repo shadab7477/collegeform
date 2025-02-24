@@ -27,7 +27,6 @@ const app = express();
 const allowedOrigins = [
   "http://localhost:3000",        // Development (React local server)
   "https://collegeforms.in",     
-    "https://collegeform-production.up.railway.app"
   //  // Production frontend (Hostinger)
 ];
 
