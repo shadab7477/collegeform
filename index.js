@@ -22,8 +22,27 @@ connectDB();
 
 const app = express();
 
-// Middlewares
-app.use(cors());
+
+
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3036", // Local development
+     
+      "https://your-frontend-url.com", // Production frontend URL
+      "https://collegeform.railway.app" // Add the Railway production URL
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Ensure all necessary methods are allowed
+    credentials: true, // Allow cookies and authentication headers
+  })
+);
+
+// Optional: Handle preflight requests explicitly
+app.options("*", cors());
+
+
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 

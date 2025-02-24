@@ -21,6 +21,8 @@ export const addBanner = async (req, res) => {
 // @desc    Get all banners
 // @route   GET /api/banners
 export const getBanners = async (req, res) => {
+  console.log("hello");
+  
   try {
     const banners = await Banner.find();
     res.json(banners); // Return all banners
