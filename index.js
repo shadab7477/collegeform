@@ -24,34 +24,35 @@ const app = express();
 
 
 
-
-
-
-
-
-
 const allowedOrigins = [
-  "http://localhost:3000",        // Development
-  "https://collegeforms.in",    
+  "http://localhost:3000",        // Development (React local server)
+  "https://collegeforms.in",     
     "https://collegeform-production.up.railway.app"
-    //  // Railway backend URL
-  //   // Production frontend (Hostinger)
+  //  // Production frontend (Hostinger)
 ];
 
 app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true); // Allow requests
+        callback(null, true); // Allow requests from allowed origins
       } else {
-        callback(new Error("Not allowed by CORS")); // Block others
+        callback(new Error("Not allowed by CORS")); // Block disallowed origins
       }
     },
-    credentials: true, // If using cookies or authentication headers
+    credentials: true, // Allow cookies and authorization headers
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Allow common HTTP methods
+    allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
   })
 );
 
-app.use(cors(corsOptions));
+// Handle preflight requests explicitly (optional but helpful)
+app.options("*", cors());
+
+
+
+
+
 
 // Handle OPTIONS preflight requests explicitly (important for complex requests)
 app.options("*", cors(corsOptions));
