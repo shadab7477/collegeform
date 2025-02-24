@@ -24,23 +24,24 @@ const app = express();
 
 
 
-app.use(
-  cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3036", // Local development
-     
-      "https://your-frontend-url.com", // Production frontend URL
-      "https://collegeform.railway.app" // Add the Railway production URL
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // Ensure all necessary methods are allowed
-    credentials: true, // Allow cookies and authentication headers
-  })
-);
 
-// Optional: Handle preflight requests explicitly
-app.options("*", cors());
+// CORS Configuration
+const corsOptions = {
+  origin: [
+    "http://localhost:3036", // Your frontend during development
+    "https://collegeforms.in/", // Your frontend during development
 
+    "https://collegeform-production.up.railway.app" // Railway backend URL
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  credentials: true, // Allows cookies and credentials
+  optionsSuccessStatus: 200, // Ensures success for older browsers
+};
+
+app.use(cors(corsOptions));
+
+// Handle OPTIONS preflight requests explicitly (important for complex requests)
+app.options("*", cors(corsOptions));
 
 
 app.use(bodyParser.json());
