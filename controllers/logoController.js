@@ -1,5 +1,5 @@
-import Logo from "../models/logo.js"; // Assuming Logo model is defined in models/logo.js
-import fs from "fs";
+import Logo from "../models/logo.js";
+import { v2 as cloudinary } from "cloudinary";
 
 // @desc    Add a new logo
 // @route   POST /api/logos
@@ -7,14 +7,21 @@ export const addLogo = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No image uploaded" });
 
-    const image = `/uploads/${req.file.filename}`; // Save image path
+    // Upload image to Cloudinary
+    const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
+      folder: "college_logos",
+    });
 
-    const newLogo = new Logo({ image });
+    const newLogo = new Logo({
+      image: uploadedImage.secure_url, // Cloudinary URL
+      publicId: uploadedImage.public_id, // Store public_id for deletion
+    });
+
     const savedLogo = await newLogo.save();
-
-    res.status(201).json(savedLogo); // Return the logo object with image path
+    res.status(201).json(savedLogo);
   } catch (error) {
-    res.status(500).json({ message: "Error adding logo", error });
+    console.error("Error adding logo:", error);
+    res.status(500).json({ message: "Error adding logo", error: error.message });
   }
 };
 
@@ -23,9 +30,10 @@ export const addLogo = async (req, res) => {
 export const getLogos = async (req, res) => {
   try {
     const logos = await Logo.find();
-    res.json(logos); // Return all logos
+    res.json(logos);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching logos", error });
+    console.error("Error fetching logos:", error);
+    res.status(500).json({ message: "Error fetching logos", error: error.message });
   }
 };
 
@@ -36,15 +44,20 @@ export const deleteLogo = async (req, res) => {
     const logo = await Logo.findById(req.params.id);
     if (!logo) return res.status(404).json({ message: "Logo not found" });
 
-    // Delete image from server
-    const imagePath = `.${logo.image}`;
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
+    // Delete image from Cloudinary using stored publicId
+    if (logo.publicId) {
+      const result = await cloudinary.uploader.destroy(logo.publicId);
+      console.log("Cloudinary Deletion Result:", result);
+
+      if (result.result !== "ok") {
+        return res.status(400).json({ message: "Failed to delete logo from Cloudinary" });
+      }
     }
 
     await logo.deleteOne();
     res.json({ message: "Logo deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting logo", error });
+    console.error("Error deleting logo:", error);
+    res.status(500).json({ message: "Error deleting logo", error: error.message });
   }
 };
