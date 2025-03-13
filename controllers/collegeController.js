@@ -9,11 +9,17 @@ export const addCollege = async (req, res) => {
   try {
     const { name, location, description, minFees, maxFees, avgPackage, exams, courses, rating, specializations } = req.body;
 
+    // Check if file is uploaded
     if (!req.file || !req.file.path) {
       return res.status(400).json({ message: "Image upload failed" });
     }
 
-    const imageUrl = req.file.path; // Save the Cloudinary URL in DB
+    // Extract image details from Cloudinary response
+    const imageUrl = req.file.path; // Cloudinary URL
+    const publicId = req.file.filename; // Cloudinary Public ID
+
+    console.log("Uploaded Image URL:", imageUrl);
+    console.log("Stored Public ID:", publicId);
 
     const newCollege = new College({
       name,
@@ -26,7 +32,8 @@ export const addCollege = async (req, res) => {
       courses: JSON.parse(courses),
       specializations: JSON.parse(specializations),
       rating: Number(rating),
-      image: imageUrl,
+      image: imageUrl, // Cloudinary URL
+      imagePublicId: publicId, // Cloudinary Public ID
     });
 
     const savedCollege = await newCollege.save();
@@ -62,16 +69,16 @@ export const deleteCollege = async (req, res) => {
     const college = await College.findById(req.params.id);
     if (!college) return res.status(404).json({ message: "College not found" });
 
-    // Extract correct Public ID from Cloudinary URL
-    if (college.image) {
-      const parts = college.image.split("/");
-      const publicId = parts[parts.length - 1].split(".")[0]; // Extract ID before file extension
+    // Delete image from Cloudinary using stored public_id
+    if (college.imagePublicId) {
+      console.log("Deleting Cloudinary Image:", college.imagePublicId);
 
-      console.log("Deleting Cloudinary Image:", publicId);
-
-      // Delete from Cloudinary (No need for callback)
-      const result = await cloudinary.uploader.destroy(publicId);
+      const result = await cloudinary.uploader.destroy(college.imagePublicId);
       console.log("Cloudinary Deletion Result:", result);
+
+      if (result.result !== "ok") {
+        return res.status(400).json({ message: "Failed to delete image from Cloudinary" });
+      }
     }
 
     // Delete college from MongoDB

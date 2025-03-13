@@ -50,6 +50,9 @@ const CollegeSchema = new mongoose.Schema(
       type: String, // Path to image
       default: "",
     },
+    imagePublicId:{
+      type:String,
+    }
 
   },
   { timestamps: true }

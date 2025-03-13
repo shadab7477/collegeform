@@ -14,14 +14,17 @@ cloudinary.config({
 
 // Configure Multer to use Cloudinary
 const storage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: "college_images", // Folder in Cloudinary
-    allowedFormats: ["jpg", "png", "jpeg"],
-    public_id: (req, file) => `${Date.now()}-${file.originalname}`, // Unique file name
-  },
-});
-
+    cloudinary,
+    params: {
+      folder: "college_images",
+      allowedFormats: ["jpg", "png", "jpeg"],
+      public_id: (req, file) => {
+        console.log("Uploading file:", file.originalname); // Debugging log
+        return `${Date.now()}-${file.originalname}`;
+      },
+    },
+  });
+  
 const upload = multer({ storage });
 
 export default upload;
