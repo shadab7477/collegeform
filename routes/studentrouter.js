@@ -32,7 +32,10 @@ router.post('/submit', async (req, res) => {
     graduationCourse,
     passingYearGraduation,
     percentageGraduation,
-    cgpaGraduation
+    cgpaGraduation,
+    college,
+    collegeName,
+    userID
   } = req.body;
 
   try {
@@ -64,6 +67,10 @@ router.post('/submit', async (req, res) => {
       passingYearGraduation,
       percentageGraduation,
       cgpaGraduation,
+      college,
+    collegeName,
+    userID
+
     });
 
     await newStudent.save();
@@ -78,6 +85,8 @@ router.get('/students', async (req, res) => {
   try {
     const students = await Student.find();
     res.status(200).json(students);
+    console.log(students);
+    
   } catch (error) {
     res.status(500).json({ message: 'Error fetching student data', error });
   }
