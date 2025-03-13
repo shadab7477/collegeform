@@ -1,16 +1,17 @@
 import express from "express";
 import multer from "multer";
 import { addCollege, getColleges, deleteCollege } from "../controllers/collegeController.js";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../config/cloudinary.js";
 
 const router = express.Router();
 
-// Multer Config
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}_${file.originalname}`);
+// Configure Multer to Use Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "college_images",
+    allowed_formats: ["jpg", "png", "jpeg"],
   },
 });
 

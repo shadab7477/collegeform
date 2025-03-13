@@ -1,24 +1,28 @@
 import College from "../models/College.js";
-import fs from "fs";
-import { fileURLToPath } from 'url';
-import path from 'path';
+import cloudinary from "../config/cloudinary.js"; // Import Cloudinary config
 
 // @desc    Add a new college
 // @route   POST /api/colleges
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 export const addCollege = async (req, res) => {
   try {
-    const { name, location, description, minFees, maxFees, avgPackage, exams, courses, rating,specializations } = req.body;
+    const { name, location, description, minFees, maxFees, avgPackage, exams, courses, rating, specializations } = req.body;
 
-    // Handle image upload
-    const image = req.file ? `/uploads/${req.file.filename}` : "";
+    // Upload Image to Cloudinary
+    let imageUrl = "";
+    let imageId = "";
 
-    // Parse JSON arrays for courses and exams
+    if (req.file) {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "college_images",
+      });
+      imageUrl = result.secure_url;
+      imageId = result.public_id;
+    }
+
+    // Parse JSON arrays for courses, exams, and specializations
     const parsedCourses = JSON.parse(courses);
     const parsedExams = JSON.parse(exams);
-    const parsedspecializations = JSON.parse(specializations);
-
+    const parsedSpecializations = JSON.parse(specializations);
 
     const newCollege = new College({
       name,
@@ -29,9 +33,10 @@ export const addCollege = async (req, res) => {
       avgPackage: Number(avgPackage),
       exams: parsedExams,
       courses: parsedCourses,
-      specializations: parsedspecializations,
+      specializations: parsedSpecializations,
       rating: Number(rating),
-      image,
+       image : imageUrl,  // Store Cloudinary image URL
+      imageId,   // Store Cloudinary public ID for deletion
     });
 
     const savedCollege = await newCollege.save();
@@ -49,13 +54,11 @@ export const getColleges = async (req, res) => {
     const colleges = await College.find();
 
     // Format colleges to ensure courses and exams are arrays
-    const formattedColleges = colleges.map((college) => {
-      return {
-        ...college._doc,
-        courses: Array.isArray(college.courses) ? college.courses : [],
-        exams: Array.isArray(college.exams) ? college.exams : [],
-      };
-    });
+    const formattedColleges = colleges.map((college) => ({
+      ...college._doc,
+      courses: Array.isArray(college.courses) ? college.courses : [],
+      exams: Array.isArray(college.exams) ? college.exams : [],
+    }));
 
     res.json(formattedColleges);
   } catch (error) {
@@ -71,12 +74,9 @@ export const deleteCollege = async (req, res) => {
     const college = await College.findById(req.params.id);
     if (!college) return res.status(404).json({ message: "College not found" });
 
-    // Delete image from server
-    if (college.image) {
-      const imagePath = path.join(__dirname, "..", college.image);
-      if (fs.existsSync(imagePath)) {
-        fs.unlinkSync(imagePath);
-      }
+    // Delete Image from Cloudinary if it exists
+    if (college.imageId) {
+      await cloudinary.uploader.destroy(college.imageId);
     }
 
     await college.deleteOne();
