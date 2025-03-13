@@ -41,6 +41,9 @@ export const getBanners = async (req, res) => {
 // @route   DELETE /api/banners/:id
 export const deleteBanner = async (req, res) => {
   try {
+
+    console.log("delete hoga");
+    
     const banner = await Banner.findById(req.params.id);
     if (!banner) return res.status(404).json({ message: "Banner not found" });
 
