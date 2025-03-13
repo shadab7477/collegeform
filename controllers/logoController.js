@@ -44,9 +44,12 @@ export const deleteLogo = async (req, res) => {
     const logo = await Logo.findById(req.params.id);
     if (!logo) return res.status(404).json({ message: "Logo not found" });
 
-    // Delete image from Cloudinary using stored publicId
+    // Check if publicId is stored correctly
+    console.log("Stored Public ID:", logo.publicId);
+
+    // Delete image from Cloudinary using publicId
     if (logo.publicId) {
-      const result = await cloudinary.uploader.destroy(logo.publicId);
+      const result = await cloudinary.uploader.destroy(logo.publicId, { invalidate: true });
       console.log("Cloudinary Deletion Result:", result);
 
       if (result.result !== "ok") {
@@ -61,3 +64,4 @@ export const deleteLogo = async (req, res) => {
     res.status(500).json({ message: "Error deleting logo", error: error.message });
   }
 };
+
