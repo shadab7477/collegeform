@@ -17,7 +17,7 @@ const storage = new CloudinaryStorage({
     cloudinary,
     params: {
       folder: "college_images",
-      allowedFormats: ["jpg", "png", "jpeg"],
+      allowedFormats: ["jpg", "png", "jpeg", "webp",'avif'],
       public_id: (req, file) => {
         console.log("Uploading file:", file.originalname); // Debugging log
         return `${Date.now()}-${file.originalname}`;
