@@ -37,7 +37,7 @@ const CollegeSchema = new mongoose.Schema(
       required: true,
     },
     specializations: {
-      type: [String], // Array of course names
+      type: [String], // Array of specialization names
       required: true,
     },
     rating: {
@@ -50,10 +50,14 @@ const CollegeSchema = new mongoose.Schema(
       type: String, // Path to image
       default: "",
     },
-    imagePublicId:{
-      type:String,
-    }
-
+    imagePublicId: {
+      type: String,
+    },
+    collegeType: {
+      type: String,
+      enum: ["UG", "PG", "Both"], // UG: Undergraduate, PG: Postgraduate, Both: Offers both
+      required: true,
+    },
   },
   { timestamps: true }
 );
