@@ -13,11 +13,6 @@ const studentSchema = new mongoose.Schema({
     required: true,  // Ensure a student selects a college
   },
 
-  userID: {
-    type: mongoose.Schema.Types.ObjectId,  // Reference College by ID
-    ref: "User",  
-    required: true,  // Ensure a student selects a college
-  },
 
 collegeName:String,
   fatherName: String,

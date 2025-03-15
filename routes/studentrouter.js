@@ -5,73 +5,22 @@ const router = express.Router();
 
 // Route to handle form submission (POST request)
 router.post('/submit', async (req, res) => {
-  const {
-    name,
-    number,
-    dob,
-    gender,
-    aadhar,
-    course,
-    fatherName,
-    fatherNumber,
-    email,
-    occupation,
-    motherName,
-    motherNumber,
-    schoolName10,
-    board10,
-    passingYear10,
-    percentage10,
-    cgpa10,
-    schoolName12,
-    board12,
-    passingYear12,
-    percentage12,
-    cgpa12,
-    graduationUniversity,
-    graduationCourse,
-    passingYearGraduation,
-    percentageGraduation,
-    cgpaGraduation,
-    college,
-    collegeName,
-    userID
-  } = req.body;
-
   try {
-    const newStudent = new Student({
-      name,
-      number,
-      dob,
-      gender,
-      aadhar,
-      course,
-      fatherName,
-      fatherNumber,
-      email,
-      occupation,
-      motherName,
-      motherNumber,
-      schoolName10,
-      board10,
-      passingYear10,
-      percentage10,
-      cgpa10,
-      schoolName12,
-      board12,
-      passingYear12,
-      percentage12,
-      cgpa12,
-      graduationUniversity,
-      graduationCourse,
-      passingYearGraduation,
-      percentageGraduation,
-      cgpaGraduation,
-      college,
-    collegeName,
-    userID
+    // Extract token from headers
+    const token = req.headers.authorization?.split(" ")[1]; // Format: "Bearer TOKEN"
 
-    });
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: No token provided" });
+    }
+
+    console.log(token);
+    
+
+
+    // Attach userID from decoded token
+    const newStudent = new Student({ ...req.body  });
+
+    console.log(newStudent);
 
     await newStudent.save();
     res.status(201).json({ message: 'Student data submitted successfully!' });
