@@ -29,6 +29,8 @@ export const addBanner = async (req, res) => {
 // @route   GET /api/banners
 export const getBanners = async (req, res) => {
   try {
+    console.log("aagye banner");
+    
     const banners = await Banner.find();
     res.json(banners);
   } catch (error) {
