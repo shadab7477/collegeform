@@ -55,7 +55,6 @@ const CollegeSchema = new mongoose.Schema(
     },
     collegeType: {
       type: String,
-      enum: ["UG", "PG", "Both"], // UG: Undergraduate, PG: Postgraduate, Both: Offers both
       required: true,
     },
   },
