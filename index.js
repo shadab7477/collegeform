@@ -79,6 +79,7 @@ app.use("/api", userauth); // Route to handle application submissions
 
 
 
+console.log("yes api is heating");
 
 
 app.use('/api/students', studentrouter);
