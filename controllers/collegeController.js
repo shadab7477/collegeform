@@ -42,7 +42,7 @@ export const addCollege = async (req, res) => {
 // @route   GET /api/colleges
 export const getColleges = async (req, res) => {
   try {
-    let { page = 1, limit = 5 } = req.query;
+    let { page = 1, limit = 10 } = req.query; // Get page & limit from query params
     page = parseInt(page);
     limit = parseInt(limit);
 
@@ -61,6 +61,7 @@ export const getColleges = async (req, res) => {
     res.status(500).json({ message: "Error fetching colleges", error: error.message });
   }
 };
+
 
 
 // @desc    Edit college details
