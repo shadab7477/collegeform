@@ -1,10 +1,11 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import User from "../models/User.js"; // Adjust according to your user model
 
 export const changePassword = async (req, res) => {
   try {
     const { oldPassword, newPassword } = req.body;
-    const userId = req.user.id; // Assuming user is authenticated
+    
+    const userId = req.user._id; // Assuming user is authenticated
 
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: "User not found" });

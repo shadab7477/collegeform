@@ -1,21 +1,30 @@
 import jwt from "jsonwebtoken";
+import User from "../models/User.js";
 
-const authMiddleware = (req, res, next) => {
-    
-    const token = req.header("Authorization");
-    console.log(token);
+const authMiddleware = async (req, res, next) => {
+  try {
+    // Extract token from headers
+    const token = req.header("Authorization")?.split(" ")[1];
+    console.log("Received Token:", token); // Debugging line
 
     if (!token) {
-        return res.status(401).json({ message: "Access Denied" });
+      return res.status(401).json({ message: "No token provided, authorization denied" });
     }
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        res.status(400).json({ message: "Invalid Token" });
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    console.log("Decoded Token:", decoded); // Debugging line
+
+    req.user = await User.findById(decoded.userId).select("-password");
+    if (!req.user) {
+      return res.status(401).json({ message: "User not found, authorization denied" });
     }
+
+    next();
+  } catch (error) {
+    console.error("JWT Error:", error.message);
+    res.status(401).json({ message: "Invalid token, authorization denied" });
+  }
 };
 
 export default authMiddleware;
