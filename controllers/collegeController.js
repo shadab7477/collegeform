@@ -42,13 +42,26 @@ export const addCollege = async (req, res) => {
 // @route   GET /api/colleges
 export const getColleges = async (req, res) => {
   try {
-    const colleges = await College.find();
-    res.json(colleges);
+    let { page = 1, limit = 5 } = req.query;
+    page = parseInt(page);
+    limit = parseInt(limit);
+
+    const totalColleges = await College.countDocuments(); // Get total number of colleges
+    const colleges = await College.find()
+      .skip((page - 1) * limit) // Skip previous pages' data
+      .limit(limit); // Limit to `limit` colleges
+
+    res.json({
+      colleges,
+      totalPages: Math.ceil(totalColleges / limit), // Calculate total pages
+      currentPage: page,
+    });
   } catch (error) {
     console.error("Error fetching colleges:", error);
     res.status(500).json({ message: "Error fetching colleges", error: error.message });
   }
 };
+
 
 // @desc    Edit college details
 // @route   PUT /api/colleges/:id
