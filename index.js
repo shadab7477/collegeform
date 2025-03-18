@@ -82,6 +82,9 @@ app.use("/api",password ); // Route to handle application submissions
 
 console.log("yes api is heating");
 
+app.get("/ping", (req, res) => {
+  res.status(200).send("Server is active");
+});
 
 app.use('/api/students', studentrouter);
 
