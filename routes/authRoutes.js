@@ -1,7 +1,8 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-
+import adminMiddleware from "../middleware/adminMiddleware.js";
+import User from "../models/User.js";
 dotenv.config();
 
 const router = express.Router();
@@ -23,5 +24,10 @@ router.post("/login", (req, res) => {
         res.status(401).json({ success: false, message: "Invalid credentials" });
     }
 });
+
+
+
+
+
 
 export default router;

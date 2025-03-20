@@ -17,6 +17,8 @@ import  specializationRoutes from "./routes/specializationRoutes.js"
 import priceRangeRoutes from "./routes/priceRangeRoutes.js"
 import applicationRoutes from './routes/applicationRoutes.js'; // Import new application routes
 import password from "./routes/password.js"
+import adminUroutes from "./routes/adminUroutes.js"
+
 dotenv.config();
 connectDB();
 
@@ -79,7 +81,7 @@ app.use("/api", userauth); // Route to handle application submissions
 
 app.use("/api",password ); // Route to handle application submissions
 
-
+app.use("/api/admin", adminUroutes);
 console.log("yes api is heating");
 
 app.get("/ping", (req, res) => {
