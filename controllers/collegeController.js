@@ -54,47 +54,36 @@ export const getColleges = async (req, res) => {
 // @route   PUT /api/colleges/:id
 export const editCollege = async (req, res) => {
   try {
-    const { name, location, description, minFees, maxFees, avgPackage, exams, courses, specializations, rating, collegeType } = req.body;
-    
-    let college = await College.findById(req.params.id);
-    if (!college) return res.status(404).json({ message: "College not found" });
-
-    let imageUrl = college.image;
-    let publicId = college.imagePublicId;
-
-    // If a new image is uploaded, update Cloudinary image
-    if (req.file && req.file.path) {
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId);
-      }
-      imageUrl = req.file.path;
-      publicId = req.file.filename;
+    // First validate the request body
+    if (!req.body || typeof req.body !== 'object') {
+      return res.status(400).json({ message: "Invalid request body" });
     }
 
-    college = await College.findByIdAndUpdate(
+    // Convert string values to arrays if needed
+    const updateData = {
+      ...req.body,
+      exams: Array.isArray(req.body.exams) ? req.body.exams : [req.body.exams],
+      courses: Array.isArray(req.body.courses) ? req.body.courses : [req.body.courses],
+      specializations: Array.isArray(req.body.specializations) ? req.body.specializations : [req.body.specializations]
+    };
+
+    const updatedCollege = await College.findByIdAndUpdate(
       req.params.id,
-      {
-        name,
-        location,
-        description,
-        minFees: Number(minFees),
-        maxFees: Number(maxFees),
-        avgPackage: Number(avgPackage),
-        exams: exams ? JSON.parse(exams) : [],
-        courses: courses ? JSON.parse(courses) : [],
-        specializations: specializations ? JSON.parse(specializations) : [],
-        rating: Number(rating),
-        collegeType,
-        image: imageUrl,
-        imagePublicId: publicId,
-      },
-      { new: true }
+      updateData,
+      { new: true, runValidators: true }
     );
 
-    res.json(college);
-  } catch (error) {
-    console.error("Error updating college:", error);
-    res.status(500).json({ message: "Error updating college", error: error.message });
+    if (!updatedCollege) {
+      return res.status(404).json({ message: "College not found" });
+    }
+
+    res.json(updatedCollege);
+  } catch (err) {
+    console.error("Error updating college:", err);
+    res.status(400).json({ 
+      message: err.message,
+      details: err.errors 
+    });
   }
 };
 
