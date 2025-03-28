@@ -1,5 +1,5 @@
 
-import MobileBanner from "../models/mobileBanner.js";
+import MobileBanner from "../models/mobileb.js";
 import { v2 as cloudinary } from "cloudinary";
 
 // @desc    Add a new mobile banner
