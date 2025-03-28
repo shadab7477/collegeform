@@ -18,6 +18,7 @@ import priceRangeRoutes from "./routes/priceRangeRoutes.js"
 import applicationRoutes from './routes/applicationRoutes.js'; // Import new application routes
 import password from "./routes/password.js"
 import adminUroutes from "./routes/adminUroutes.js"
+import mbanner from "./routes/mbanner.js"
 
 dotenv.config();
 connectDB();
@@ -74,7 +75,7 @@ app.use("/courses", courseRoutes);
 app.use("/locations", locationRoutes);
 app.use("/api/logos", LogoRoutes); // Add logo routes
 app.use("/api/applications", applicationRoutes); // Route to handle application submissions
-
+app.use("/api/mbanner", mbanner )
 app.use('/specializations', specializationRoutes);
 app.use('/priceRanges', priceRangeRoutes);
 app.use("/api", userauth); // Route to handle application submissions
