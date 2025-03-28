@@ -5,7 +5,9 @@ import { v2 as cloudinary } from "cloudinary";
 // @route   POST /api/banners
 export const addBanner = async (req, res) => {
   try {
-    if (!req.file) return res.status(400).json({ message: "No image uploaded" });
+    if (!req.file) {
+      return res.status(400).json({ message: "No image uploaded" });
+    }
 
     // Upload image to Cloudinary
     const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
@@ -13,15 +15,19 @@ export const addBanner = async (req, res) => {
     });
 
     const newBanner = new Banner({
-      image: uploadedImage.secure_url, // Cloudinary URL
-      publicId: uploadedImage.public_id, // Store public_id for deletion
+      image: uploadedImage.secure_url,
+      publicId: uploadedImage.public_id,
+      link: req.body.link || null // Add link field from request body
     });
 
     const savedBanner = await newBanner.save();
     res.status(201).json(savedBanner);
   } catch (error) {
     console.error("Error adding banner:", error);
-    res.status(500).json({ message: "Error adding banner", error: error.message });
+    res.status(500).json({ 
+      message: "Error adding banner", 
+      error: error.message 
+    });
   }
 };
 
@@ -29,13 +35,14 @@ export const addBanner = async (req, res) => {
 // @route   GET /api/banners
 export const getBanners = async (req, res) => {
   try {
-    console.log("aagye banner");
-    
-    const banners = await Banner.find();
+    const banners = await Banner.find().sort({ createdAt: -1 }); // Sort by newest first
     res.json(banners);
   } catch (error) {
     console.error("Error fetching banners:", error);
-    res.status(500).json({ message: "Error fetching banners", error: error.message });
+    res.status(500).json({ 
+      message: "Error fetching banners", 
+      error: error.message 
+    });
   }
 };
 
@@ -43,26 +50,51 @@ export const getBanners = async (req, res) => {
 // @route   DELETE /api/banners/:id
 export const deleteBanner = async (req, res) => {
   try {
-
-    console.log("delete hoga");
-    
     const banner = await Banner.findById(req.params.id);
-    if (!banner) return res.status(404).json({ message: "Banner not found" });
-
-    // Delete image from Cloudinary using stored publicId
-    if (banner.publicId) {
-      const result = await cloudinary.uploader.destroy(banner.publicId);
-      console.log("Cloudinary Deletion Result:", result);
-
-      if (result.result !== "ok") {
-        return res.status(400).json({ message: "Failed to delete image from Cloudinary" });
-      }
+    if (!banner) {
+      return res.status(404).json({ message: "Banner not found" });
     }
 
-    await banner.deleteOne();
-    res.json({ message: "Banner deleted successfully" });
+    // Delete image from Cloudinary
+    if (banner.publicId) {
+      await cloudinary.uploader.destroy(banner.publicId);
+    }
+
+    await Banner.findByIdAndDelete(req.params.id);
+    res.json({ 
+      message: "Banner deleted successfully",
+      deletedBanner: banner
+    });
   } catch (error) {
     console.error("Error deleting banner:", error);
-    res.status(500).json({ message: "Error deleting banner", error: error.message });
+    res.status(500).json({ 
+      message: "Error deleting banner", 
+      error: error.message 
+    });
+  }
+};
+
+// @desc    Update a banner's link
+// @route   PATCH /api/banners/:id
+export const updateBannerLink = async (req, res) => {
+  try {
+    const { link } = req.body;
+    const banner = await Banner.findByIdAndUpdate(
+      req.params.id,
+      { link },
+      { new: true }
+    );
+
+    if (!banner) {
+      return res.status(404).json({ message: "Banner not found" });
+    }
+
+    res.json(banner);
+  } catch (error) {
+    console.error("Error updating banner link:", error);
+    res.status(500).json({ 
+      message: "Error updating banner link", 
+      error: error.message 
+    });
   }
 };
