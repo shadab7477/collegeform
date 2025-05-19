@@ -86,14 +86,14 @@ console.log(req.body);
 
 
 router.get('/', async (req, res) => {
-    try {
-      const applications = await Application.find(); // Fetch all applications
-      res.json(applications);
-    } catch (error) {
-      res.status(500).json({ message: 'Error fetching applications' });
-    }
-  });
-  
+  try {
+    const applications = await Application.find().sort({ createdAt: -1 }); // Latest first
+    res.json(applications);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching applications' });
+  }
+});
+
 
 
 
