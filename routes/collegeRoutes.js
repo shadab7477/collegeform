@@ -7,6 +7,11 @@ const router = express.Router();
 // Routes
 router.post("/", upload.single("image"), addCollege);
 router.get("/", getColleges);
+
+
+
+
+
 router.delete("/:id", deleteCollege);
 router.put("/:id", upload.single("image"), editCollege); // ✅ Add Edit College Route
 router.get("/:id", async (req, res) => {

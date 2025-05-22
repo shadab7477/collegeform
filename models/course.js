@@ -1,17 +1,24 @@
-import mongoose from "mongoose"
-
+import mongoose from 'mongoose';
 
 const courseSchema = new mongoose.Schema({
-    name: String,
-    description: String,
-    price: Number
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  type: {
+    type: String,
+    enum: ['UG', 'PG'],
+    default: 'UG'
+  },
+  specializations: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Specialization'
+  }]
+}, {
+  timestamps: true
 });
-
-
-
 
 const Course = mongoose.model('Course', courseSchema);
 
-
-
-export default Course
+export default Course;
