@@ -18,6 +18,7 @@ import applicationRoutes from './routes/applicationRoutes.js';
 import password from "./routes/password.js";
 import adminUroutes from "./routes/adminUroutes.js";
 import mbanner from "./routes/mbanner.js";
+import blogRoutes from "./routes/blogRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -95,7 +96,12 @@ app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 
 // API Routes
 app.use("/api/colleges", collegeRoutes);
+
+
 app.use("/api/banners", bannerRoutes);
+
+app.use("/api/blogs", blogRoutes);
+
 app.use("/api/auth", authRoutes);
 app.use("/courses", courseRoutes);
 app.use("/locations", locationRoutes);
@@ -111,6 +117,16 @@ app.use('/api/students', studentrouter);
 
 // Health check endpoint
 app.get("/ping", (req, res) => {
+  console.log("worked")
+  res.status(200).json({ 
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
+
+
+app.get("/start", (req, res) => {
   res.status(200).json({ 
     status: "healthy",
     timestamp: new Date().toISOString(),
