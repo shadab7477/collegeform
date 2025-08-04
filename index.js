@@ -116,14 +116,7 @@ app.use("/api/admin", adminUroutes);
 app.use('/api/students', studentrouter);
 
 // Health check endpoint
-app.get("/ping", (req, res) => {
-  console.log("worked")
-  res.status(200).json({ 
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime()
-  });
-});
+
 
 
 app.get("/start", (req, res) => {
