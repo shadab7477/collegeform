@@ -5,7 +5,8 @@ import { v2 as cloudinary } from "cloudinary";
 // @route   POST /api/colleges
 export const addCollege = async (req, res) => {
   try {
-    const { name, location, description, minFees, maxFees, avgPackage, exams, courses, specializations, rating, collegeType } = req.body;
+    const { name, location, description, minFees, maxFees, avgPackage, exams, 
+            courses, specializations, rating, collegeType, category } = req.body;
 
     if (!req.file || !req.file.path) {
       return res.status(400).json({ message: "Image upload failed" });
@@ -25,7 +26,8 @@ export const addCollege = async (req, res) => {
       courses: courses ? JSON.parse(courses) : [],
       specializations: specializations ? JSON.parse(specializations) : [],
       rating: Number(rating),
-      collegeType,
+      collegeType: collegeType ? JSON.parse(collegeType) : [],
+      category: category || "Default",
       image: imageUrl,
       imagePublicId: publicId,
     });
@@ -54,18 +56,35 @@ export const getColleges = async (req, res) => {
 // @route   PUT /api/colleges/:id
 export const editCollege = async (req, res) => {
   try {
-    // First validate the request body
-    if (!req.body || typeof req.body !== 'object') {
-      return res.status(400).json({ message: "Invalid request body" });
-    }
+    const { name, location, description, minFees, maxFees, avgPackage, 
+            exams, courses, specializations, rating, collegeType, category } = req.body;
 
-    // Convert string values to arrays if needed
-    const updateData = {
-      ...req.body,
-      exams: Array.isArray(req.body.exams) ? req.body.exams : [req.body.exams],
-      courses: Array.isArray(req.body.courses) ? req.body.courses : [req.body.courses],
-      specializations: Array.isArray(req.body.specializations) ? req.body.specializations : [req.body.specializations]
+    let updateData = {
+      name,
+      location,
+      description,
+      minFees: Number(minFees),
+      maxFees: Number(maxFees),
+      avgPackage: Number(avgPackage),
+      exams: exams ? JSON.parse(exams) : [],
+      courses: courses ? JSON.parse(courses) : [],
+      specializations: specializations ? JSON.parse(specializations) : [],
+      rating: Number(rating),
+      collegeType: collegeType ? JSON.parse(collegeType) : [],
+      category: category || "Default",
     };
+
+    // Handle image update if new file is uploaded
+    if (req.file && req.file.path) {
+      // First delete the old image if it exists
+      const college = await College.findById(req.params.id);
+      if (college.imagePublicId) {
+        await cloudinary.uploader.destroy(college.imagePublicId);
+      }
+      
+      updateData.image = req.file.path;
+      updateData.imagePublicId = req.file.filename;
+    }
 
     const updatedCollege = await College.findByIdAndUpdate(
       req.params.id,
@@ -78,11 +97,11 @@ export const editCollege = async (req, res) => {
     }
 
     res.json(updatedCollege);
-  } catch (err) {
-    console.error("Error updating college:", err);
+  } catch (error) {
+    console.error("Error updating college:", error);
     res.status(400).json({ 
-      message: err.message,
-      details: err.errors 
+      message: error.message,
+      details: error.errors 
     });
   }
 };

@@ -29,34 +29,40 @@ const CollegeSchema = new mongoose.Schema(
       required: true,
     },
     exams: {
-      type: [String], // Array of exam names
+      type: [String],
       default: [],
     },
     courses: {
-      type: [String], // Array of course names
+      type: [String],
       required: true,
     },
     specializations: {
-      type: [String], // Array of specialization names
+      type: [String],
       required: true,
     },
     rating: {
       type: Number,
       default: 0,
       min: 0,
-      max: 5, // Assuming rating is out of 5
+      max: 5,
     },
     image: {
-      type: String, // Path to image
+      type: String,
       default: "",
     },
     imagePublicId: {
       type: String,
     },
     collegeType: {
-      type: String,
+      type: [String],
       required: true,
     },
+    category: {
+      type: String,
+      required: true,
+      enum: ["Default", "Overseas Education", "Vocational Education", "Scholarship Based Education", "Government Colleges"],
+      default: "Default"
+    }
   },
   { timestamps: true }
 );
