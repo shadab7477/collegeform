@@ -12,6 +12,7 @@ const adminMiddleware = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token.replace("Bearer ", ""), process.env.JWT_SECRET);
+    console.log(decoded);
     
     // Ensure token is for admin
     if (decoded.username !== process.env.FIXED_USERNAME) {

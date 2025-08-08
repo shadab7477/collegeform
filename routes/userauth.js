@@ -21,7 +21,12 @@ router.post("/signup", async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new user
-    const newUser = new User({ name, email, phone, password: hashedPassword });
+    const newUser = new User({ 
+      name, 
+      email, 
+      phone, 
+      password: hashedPassword 
+    });
     await newUser.save();
 
     // Generate JWT
@@ -38,6 +43,9 @@ router.post("/signup", async (req, res) => {
         name: newUser.name,
         email: newUser.email,
         phone: newUser.phone,
+        dob: newUser.dob,
+        address: newUser.address,
+        education: newUser.education
       },
     });
   } catch (error) {
@@ -75,12 +83,56 @@ router.post("/login", async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        dob: user.dob,
+        address: user.address,
+        education: user.education
       },
     });
   } catch (error) {
     console.error("Login Error:", error);
     res.status(500).json({ message: "Server error" });
   }
+});
+
+// Edit Profile
+router.put('/edit-profile', authMiddleware, async (req, res) => {
+    try {
+        const { name, phone, dob, address, education } = req.body;
+        const userId = req.user.id;
+
+        // Find user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Update user fields
+        if (name) user.name = name;
+        if (phone) user.phone = phone;
+        if (dob) user.dob = new Date(dob);
+        if (address) user.address = address;
+        if (education) user.education = education;
+
+        // Save updated user
+        await user.save();
+
+        // Return updated user info (excluding password)
+        res.status(200).json({
+            message: "Profile updated successfully",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                dob: user.dob,
+                address: user.address,
+                education: user.education
+            }
+        });
+    } catch (error) {
+        console.error("Profile update error:", error);
+        res.status(500).json({ message: "Error updating profile" });
+    }
 });
 
 export default router;

@@ -8,25 +8,37 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true, // Ensure emails are unique
+        unique: true,
     },
     phone: {
         type: String,
     },
     password: {
         type: String,
-        required: true, // Password is required
+        required: true,
+    },
+    dob: {
+        type: Date,
+        required: false
+    },
+    address: {
+        type: String,
+        required: false
+    },
+    education: {
+        type: String,
+        required: false
     },
     status: {
         type: String,
         enum: ['Complete', 'Pending'],
-        default: 'Pending', // Default status is Pending
+        default: 'Pending',
     },
     remark: { 
         type: String, 
         default: "" 
     }
-}, { timestamps: true }); // Adds createdAt and updatedAt timestamps
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 

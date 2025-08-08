@@ -77,9 +77,10 @@ export const trackCollegeView = async (req, res) => {
 };
 
 // Get user search history
-export const getUserSearchHistory = async (req, res) => {
+// Get user search history by ID (admin access)
+export const getUserSearchHistoryById = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const { userId } = req.params;
 
     const searchHistory = await SearchHistory.find({ user: userId })
       .sort({ createdAt: -1 })
