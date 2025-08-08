@@ -3,6 +3,8 @@ import College from "../models/College.js";
 
 // Save user search filters
 export const saveSearchFilters = async (req, res) => {
+    console.log(req.body);
+    
   try {
     const { filters } = req.body;
     const userId = req.user.id;
@@ -30,6 +32,8 @@ export const saveSearchFilters = async (req, res) => {
 
 // Track college views
 export const trackCollegeView = async (req, res) => {
+    console.log(req.body);
+    
   try {
     const { collegeId } = req.body;
     const userId = req.user.id;

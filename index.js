@@ -127,7 +127,13 @@ app.get("/start", (req, res) => {
     uptime: process.uptime()
   });
 });
-
+app.get("/ping", (req, res) => {
+  res.status(200).json({ 
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime()
+  });
+});
 // Default Route
 app.get("/", (req, res) => {
   res.json({
