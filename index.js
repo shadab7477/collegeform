@@ -19,6 +19,7 @@ import password from "./routes/password.js";
 import adminUroutes from "./routes/adminUroutes.js";
 import mbanner from "./routes/mbanner.js";
 import blogRoutes from "./routes/blogRoutes.js";
+import searchHistoryRoutes from "./routes/searchHistoryRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -153,6 +154,12 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong!'
   });
 });
+
+
+
+// ... other imports and setup
+
+app.use("/api/search", searchHistoryRoutes);
 
 // 404 Handler
 app.use((req, res) => {
