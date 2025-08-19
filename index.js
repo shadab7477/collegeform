@@ -20,6 +20,7 @@ import adminUroutes from "./routes/adminUroutes.js";
 import mbanner from "./routes/mbanner.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import searchHistoryRoutes from "./routes/searchHistoryRoutes.js";
+import sliderRoutes from "./routes/sliderRoutes.js";
 
 // Load environment variables
 dotenv.config();
@@ -100,6 +101,8 @@ app.use("/api/colleges", collegeRoutes);
 
 
 app.use("/api/banners", bannerRoutes);
+
+app.use("/api/slider", sliderRoutes);
 
 app.use("/api/blogs", blogRoutes);
 

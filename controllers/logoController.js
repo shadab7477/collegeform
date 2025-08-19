@@ -1,11 +1,16 @@
 import Logo from "../models/logo.js";
 import { v2 as cloudinary } from "cloudinary";
-
+import College from "../models/College.js";
 // @desc    Add a new logo
 // @route   POST /api/logos
 export const addLogo = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No image uploaded" });
+    if (!req.body.collegeId) return res.status(400).json({ message: "College ID is required" });
+
+    // Find the college
+    const college = await College.findById(req.body.collegeId);
+    if (!college) return res.status(404).json({ message: "College not found" });
 
     // Upload image to Cloudinary
     const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
@@ -13,8 +18,11 @@ export const addLogo = async (req, res) => {
     });
 
     const newLogo = new Logo({
-      image: uploadedImage.secure_url, // Cloudinary URL
-      publicId: uploadedImage.public_id, // Store public_id for deletion
+      image: uploadedImage.secure_url,
+      publicId: uploadedImage.public_id,
+      collegeName: college.name,
+      collegeId: college._id,
+      discount: req.body.discount,
     });
 
     const savedLogo = await newLogo.save();
