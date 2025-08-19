@@ -60,7 +60,7 @@ const CollegeSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ["Default", "Overseas Education", "Vocational Education", "Scholarship Based Education", "Government Colleges"],
+      enum: ["Default", "Online-Education","OverseasEducation", "vocational-institutes", "ScholarshipBasedEducation","government-colleges"],
       default: "Default"
     }
   },
