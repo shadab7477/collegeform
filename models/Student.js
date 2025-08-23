@@ -8,13 +8,11 @@ const studentSchema = new mongoose.Schema({
   aadhar: String,
   course: String,
   college: {
-    type: mongoose.Schema.Types.ObjectId,  // Reference College by ID
+    type: mongoose.Schema.Types.ObjectId,
     ref: "College",  
-    required: true,  // Ensure a student selects a college
+    required: true,
   },
-
-
-collegeName:String,
+  collegeName: String,
   fatherName: String,
   fatherNumber: String,
   email: String,
@@ -36,8 +34,16 @@ collegeName:String,
   passingYearGraduation: String,
   percentageGraduation: Number,
   cgpaGraduation: Number,
-  status: { type: Boolean, default: true }, // Active by default
+  isGraduation: { type: Boolean, default: false },
+  status: { type: Boolean, default: true },
   remarks: { type: String, default: "" },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  }
+}, {
+  timestamps: true
 });
 
 const Student = mongoose.model("Student", studentSchema);

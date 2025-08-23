@@ -44,32 +44,32 @@ export const createBlog = async (req, res) => {
 
 // @desc    Get all blogs
 // @route   GET /api/blogs
-export const getAllBlogs = async (req, res) => {
+  export const getAllBlogs = async (req, res) => {
 
-  try {
-    console.log("CHalrhi h");
+    try {
+      console.log("CHalrhi h");
 
-    const { category, featured } = req.query;
-    let query = {};
-    
-    if (category) {
-      query.category = category;
+      const { category, featured } = req.query;
+      let query = {};
+      
+      if (category) {
+        query.category = category;
+      }
+      
+      if (featured) {
+        query.isFeatured = true;
+      }
+      
+      const blogs = await Blog.find(query).sort({ createdAt: -1 });
+      res.json(blogs);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      res.status(500).json({ 
+        message: "Error fetching blogs", 
+        error: error.message 
+      });
     }
-    
-    if (featured) {
-      query.isFeatured = true;
-    }
-    
-    const blogs = await Blog.find(query).sort({ createdAt: -1 });
-    res.json(blogs);
-  } catch (error) {
-    console.error("Error fetching blogs:", error);
-    res.status(500).json({ 
-      message: "Error fetching blogs", 
-      error: error.message 
-    });
-  }
-};
+  };
 
 // @desc    Get featured blogs
 // @route   GET /api/blogs/featured

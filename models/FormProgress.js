@@ -1,4 +1,3 @@
-// models/FormProgress.js
 import mongoose from 'mongoose';
 
 const formProgressSchema = new mongoose.Schema({
