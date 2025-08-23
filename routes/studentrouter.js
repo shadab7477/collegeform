@@ -80,4 +80,85 @@ console.log(req.body);
 });
 
 
+
+// Add to your backend routes (students.js)
+
+// Save progress
+router.post('/save-progress', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: No token provided" });
+    }
+    
+    // Verify token and get user ID
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+    
+    // Find and update or create progress document
+    const progress = await FormProgress.findOneAndUpdate(
+      { userId },
+      { 
+        formData: req.body.formData,
+        activeStep: req.body.activeStep,
+        userId
+      },
+      { upsert: true, new: true }
+    );
+    
+    res.status(200).json({ message: 'Progress saved successfully!' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error saving progress', error });
+  }
+});
+
+// Get progress
+router.get('/progress', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: No token provided" });
+    }
+    
+    // Verify token and get user ID
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+    
+    // Find progress document
+    const progress = await FormProgress.findOne({ userId });
+    
+    if (!progress) {
+      return res.status(404).json({ message: 'No saved progress found' });
+    }
+    
+    res.status(200).json(progress);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching progress', error });
+  }
+});
+
+// Clear progress after submission
+router.delete('/clear-progress', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(" ")[1];
+    
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized: No token provided" });
+    }
+    
+    // Verify token and get user ID
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+    
+    // Delete progress document
+    await FormProgress.findOneAndDelete({ userId });
+    
+    res.status(200).json({ message: 'Progress cleared successfully!' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error clearing progress', error });
+  }
+});
+
 export default router;

@@ -101,13 +101,21 @@ export const editCollege = async (req, res) => {
 // @route   GET /api/colleges
 export const getColleges = async (req, res) => {
   try {
-    const colleges = await College.find();
+    let colleges = await College.find();
+
+    // Shuffle the array (Fisher–Yates shuffle)
+    for (let i = colleges.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [colleges[i], colleges[j]] = [colleges[j], colleges[i]];
+    }
+
     res.json(colleges);
   } catch (error) {
     console.error("Error fetching colleges:", error);
     res.status(500).json({ message: "Error fetching colleges", error: error.message });
   }
 };
+
 
 // @desc    Edit college details
 // @route   PUT /api/colleges/:id
