@@ -62,6 +62,10 @@ const CollegeSchema = new mongoose.Schema(
       required: true,
       enum: ["Default", "Online-Education","OverseasEducation", "vocational-institutes", "ScholarshipBasedEducation","government-colleges"],
       default: "Default"
+    },
+    isTopCollege: {  // Added isTopCollege field
+      type: Boolean,
+      default: false
     }
   },
   { timestamps: true }

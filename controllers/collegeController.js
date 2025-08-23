@@ -3,10 +3,11 @@ import { v2 as cloudinary } from "cloudinary";
 
 // @desc    Add a new college
 // @route   POST /api/colleges
+
 export const addCollege = async (req, res) => {
   try {
     const { name, location, description, minFees, maxFees, avgPackage, exams, 
-            courses, specializations, rating, collegeType, category } = req.body;
+            courses, specializations, rating, collegeType, category, isTopCollege } = req.body;
 
     if (!req.file || !req.file.path) {
       return res.status(400).json({ message: "Image upload failed" });
@@ -28,6 +29,7 @@ export const addCollege = async (req, res) => {
       rating: Number(rating),
       collegeType: collegeType ? JSON.parse(collegeType) : [],
       category: category || "Default",
+      isTopCollege: isTopCollege === 'true', // Handle isTopCollege
       image: imageUrl,
       imagePublicId: publicId,
     });
@@ -40,24 +42,12 @@ export const addCollege = async (req, res) => {
   }
 };
 
-// @desc    Get all colleges
-// @route   GET /api/colleges
-export const getColleges = async (req, res) => {
-  try {
-    const colleges = await College.find();
-    res.json(colleges);
-  } catch (error) {
-    console.error("Error fetching colleges:", error);
-    res.status(500).json({ message: "Error fetching colleges", error: error.message });
-  }
-};
-
 // @desc    Edit college details
 // @route   PUT /api/colleges/:id
 export const editCollege = async (req, res) => {
   try {
     const { name, location, description, minFees, maxFees, avgPackage, 
-            exams, courses, specializations, rating, collegeType, category } = req.body;
+            exams, courses, specializations, rating, collegeType, category, isTopCollege } = req.body;
 
     let updateData = {
       name,
@@ -72,6 +62,7 @@ export const editCollege = async (req, res) => {
       rating: Number(rating),
       collegeType: collegeType ? JSON.parse(collegeType) : [],
       category: category || "Default",
+      isTopCollege: isTopCollege === 'true', // Handle isTopCollege
     };
 
     // Handle image update if new file is uploaded
@@ -105,6 +96,22 @@ export const editCollege = async (req, res) => {
     });
   }
 };
+
+// @desc    Get all colleges
+// @route   GET /api/colleges
+export const getColleges = async (req, res) => {
+  try {
+    const colleges = await College.find();
+    res.json(colleges);
+  } catch (error) {
+    console.error("Error fetching colleges:", error);
+    res.status(500).json({ message: "Error fetching colleges", error: error.message });
+  }
+};
+
+// @desc    Edit college details
+// @route   PUT /api/colleges/:id
+
 
 // @desc    Delete a college
 // @route   DELETE /api/colleges/:id
