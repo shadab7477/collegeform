@@ -65,18 +65,21 @@ export const updateStudent = async (req, res) => {
 };
 
 // Save form progress
+// Save form progress - modified to include collegeId
 export const saveFormProgress = async (req, res) => {
   try {
     console.log('User saving progress:', req.user);
     
-    const userId = req.user.id || req.user._id; // Handle both cases
+    const userId = req.user.id || req.user._id;
+    const { formData, activeStep, collegeId } = req.body; // Add collegeId
     
     const progress = await FormProgress.findOneAndUpdate(
-      { userId },
+      { userId, collegeId }, // Include collegeId in the query
       { 
-        formData: req.body.formData,
-        activeStep: req.body.activeStep,
-        userId
+        formData,
+        activeStep,
+        userId,
+        collegeId // Store collegeId
       },
       { upsert: true, new: true }
     );
@@ -87,13 +90,16 @@ export const saveFormProgress = async (req, res) => {
   }
 };
 
-// Get form progress
+// Get form progress - modified to include collegeId
 export const getFormProgress = async (req, res) => {
   try {
-    const userId = req.user.id || req.user._id; // Handle both cases
-    console.log("Fetching progress for user:", userId);
+    console.log("hit nhi horhi");
     
-    const progress = await FormProgress.findOne({ userId });
+    const userId = req.user.id || req.user._id;
+    const collegeId = req.query.collegeId; // Get collegeId from query params
+    console.log(collegeId);
+    
+    const progress = await FormProgress.findOne({ userId, collegeId });
     
     if (!progress) {
       return res.status(404).json({ message: 'No saved progress found' });
@@ -106,13 +112,34 @@ export const getFormProgress = async (req, res) => {
   }
 };
 
-// Clear form progress
+
+export const getAllFormProgress = async (req, res) => {
+  try {
+    console.log("hit nhi horhi");
+    
+    const userId = req.user.id || req.user._id;
+    console.log("howhi h bawa");
+    
+    const progress = await FormProgress.find({ userId });
+    
+    if (!progress) {
+      return res.status(404).json({ message: 'No saved progress found' });
+    }
+    
+    res.status(200).json(progress);
+  } catch (error) {
+    console.error("Error fetching progress:", error);
+    res.status(500).json({ message: 'Error fetching progress', error });
+  }
+};
+
+// Clear form progress - modified to include collegeId
 export const clearFormProgress = async (req, res) => {
   try {
-    console.log('User clearing progress:', req.user);
-    const userId = req.user.id || req.user._id; // Handle both cases
+    const userId = req.user.id || req.user._id;
+    const collegeId = req.query.collegeId; // Get collegeId from query params
     
-    await FormProgress.findOneAndDelete({ userId });
+    await FormProgress.findOneAndDelete({ userId, collegeId });
     
     res.status(200).json({ message: 'Progress cleared successfully!' });
   } catch (error) {

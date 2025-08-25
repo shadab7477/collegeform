@@ -6,7 +6,8 @@ import {
   updateStudent,
   saveFormProgress,
   getFormProgress,
-  clearFormProgress
+  clearFormProgress,
+  getAllFormProgress
 } from '../controllers/studentController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 
@@ -16,14 +17,20 @@ const router = express.Router();
 router.use(authMiddleware);
 
 // Student routes
+// Student routes
 router.post('/submit', submitStudentForm);
 router.get('/students', getAllStudents);
+
+// Form progress routes (specific before dynamic)
+router.get('/progress', getFormProgress);
+router.get('/Allprogress', getAllFormProgress);
+
+router.post('/save-progress', saveFormProgress);
+router.delete('/clear-progress', clearFormProgress);
+
+// Student by ID (must come last)
 router.get('/:id', getStudentById);
 router.put('/update/:id', updateStudent);
 
-// Form progress routes
-router.post('/save-progress', saveFormProgress);
-router.get('/progressing', getFormProgress);
-router.delete('/clear-progress', clearFormProgress);
 
 export default router;
