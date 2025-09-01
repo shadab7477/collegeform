@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const CollegeSchema = new mongoose.Schema(
   {
@@ -6,6 +7,11 @@ const CollegeSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+    },
+    slug: {
+      type: String,
+      unique: true,
+      index: true,
     },
     location: {
       type: String,
@@ -60,17 +66,31 @@ const CollegeSchema = new mongoose.Schema(
     category: {
       type: String,
       required: true,
-      enum: ["Default", "Online-Education","OverseasEducation", "vocational-institutes", "ScholarshipBasedEducation","government-colleges"],
-      default: "Default"
+      enum: [
+        "Default",
+        "Online-Education",
+        "OverseasEducation",
+        "vocational-institutes",
+        "ScholarshipBasedEducation",
+        "government-colleges",
+      ],
+      default: "Default",
     },
-    isTopCollege: {  // Added isTopCollege field
+    isTopCollege: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-const College = mongoose.model("College", CollegeSchema);
+// ✅ Automatically generate slug from name
+CollegeSchema.pre("save", function (next) {
+  if (this.isModified("name")) {
+    this.slug = slugify(this.name, { lower: true, strict: true });
+  }
+  next();
+});
 
+const College = mongoose.model("College", CollegeSchema);
 export default College;
