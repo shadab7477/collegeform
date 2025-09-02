@@ -21,6 +21,7 @@ import mbanner from "./routes/mbanner.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import searchHistoryRoutes from "./routes/searchHistoryRoutes.js";
 import sliderRoutes from "./routes/sliderRoutes.js";
+import exams from "./routes/exams.js";
 
 // Load environment variables
 dotenv.config();
@@ -105,8 +106,9 @@ app.use("/api/banners", bannerRoutes);
 app.use("/api/slider", sliderRoutes);
 
 app.use("/api/blogs", blogRoutes);
-
 app.use("/api/auth", authRoutes);
+
+app.use("/api/exams", exams);
 app.use("/courses", courseRoutes);
 app.use("/locations", locationRoutes);
 app.use("/api/logos", LogoRoutes);

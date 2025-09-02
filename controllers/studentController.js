@@ -15,11 +15,23 @@ export const getAllStudents = async (req, res) => {
 // Get student by ID
 export const getStudentById = async (req, res) => {
   try {
-    const student = await Student.findById(req.params.id);
-    if (!student) return res.status(404).json({ message: 'Student not found' });
-    res.json(student);
+    console.log('User ID from params:', req.params.id);
+    
+    // Find students by userId, not by their own _id
+    const students = await Student.find({ userId: req.params.id })
+      .populate('college') // Populate college data if needed
+      .populate('userId', 'name email'); // Populate user data if needed
+    
+    console.log('Found students:', students);
+    
+    if (!students || students.length === 0) {
+      return res.status(404).json({ message: 'No applications found for this user' });
+    }
+    
+    res.json(students);
   } catch (err) {
-    res.status(500).json({ message: 'Error fetching student data', error: err });
+    console.error('Error fetching student data:', err);
+    res.status(500).json({ message: 'Error fetching student data', error: err.message });
   }
 };
 
