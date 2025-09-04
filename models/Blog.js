@@ -1,3 +1,4 @@
+// models/Blog.js
 import mongoose from "mongoose";
 
 const blogSchema = new mongoose.Schema({
@@ -5,6 +6,11 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
+  },
+  slug: {
+    type: String,
+    unique: true,
+    lowercase: true
   },
   content: {
     type: String,
@@ -35,10 +41,8 @@ const blogSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
-
   excerpt: {
     type: String,
-    maxlength: 160
   },
   isFeatured: {
     type: Boolean,
@@ -48,7 +52,13 @@ const blogSchema = new mongoose.Schema({
 
 // Middleware to generate slug before saving
 blogSchema.pre('save', function(next) {
-  this.slug = this.title.toLowerCase().replace(/ /g, '-').replace(/[^\w-]+/g, '');
+  if (this.isModified('title') || this.isNew) {
+    this.slug = slugify(this.title, { 
+      lower: true, 
+      strict: true,
+      remove: /[*+~.()'"!:@]/g
+    });
+  }
   this.updatedAt = Date.now();
   next();
 });

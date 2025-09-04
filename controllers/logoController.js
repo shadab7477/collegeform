@@ -21,7 +21,7 @@ export const addLogo = async (req, res) => {
       image: uploadedImage.secure_url,
       publicId: uploadedImage.public_id,
       collegeName: college.name,
-      collegeId: college._id,
+      collegeId: college.slug,
       discount: req.body.discount,
     });
 

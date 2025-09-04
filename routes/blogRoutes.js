@@ -6,7 +6,8 @@ import {
   getBlogById, 
   updateBlog, 
   deleteBlog,
-  getFeaturedBlogs
+  getFeaturedBlogs,
+  getBlogBySlug
 } from "../controllers/blogController.js";
 
 const router = express.Router();
@@ -21,7 +22,7 @@ router.get("/", getAllBlogs);
 router.get("/featured", getFeaturedBlogs);
 
 // Get a single blog by slug
-router.get("/:id", getBlogById);
+router.get("/:slug", getBlogBySlug);
 
 // Update a blog
 router.put("/:id", upload.single("image"), updateBlog);
