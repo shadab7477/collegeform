@@ -22,7 +22,10 @@ router.get("/", getAllBlogs);
 router.get("/featured", getFeaturedBlogs);
 
 // Get a single blog by slug
-router.get("/:slug", getBlogBySlug);
+router.get("/slug/:slug", getBlogBySlug);
+
+// Get a single blog by ID
+router.get("/id/:id", getBlogById);
 
 // Update a blog
 router.put("/:id", upload.single("image"), updateBlog);

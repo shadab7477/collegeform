@@ -1,5 +1,5 @@
-// models/Blog.js
 import mongoose from "mongoose";
+import slugify from "slugify";
 
 const blogSchema = new mongoose.Schema({
   title: {

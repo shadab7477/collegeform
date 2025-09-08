@@ -1,11 +1,10 @@
-// controllers/blogController.js
 import Blog from "../models/Blog.js";
 import { v2 as cloudinary } from "cloudinary";
-import slugify from "slugify";
 
 // @desc    Create a new blog
 // @route   POST /api/blogs
 export const createBlog = async (req, res) => {
+  
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No image uploaded" });
@@ -19,16 +18,8 @@ export const createBlog = async (req, res) => {
     // Generate excerpt from content
     const excerpt = req.body.content.substring(0, 160) + (req.body.content.length > 560 ? "..." : "");
 
-    // Generate slug
-    const slug = slugify(req.body.title, { 
-      lower: true, 
-      strict: true,
-      remove: /[*+~.()'"!:@]/g
-    });
-
     const newBlog = new Blog({
       title: req.body.title,
-      slug: slug,
       content: req.body.content,
       image: uploadedImage.secure_url,
       publicId: uploadedImage.public_id,
@@ -116,15 +107,6 @@ export const updateBlog = async (req, res) => {
       updatedAt: Date.now()
     };
 
-    // If title changed, generate new slug
-    if (req.body.title && req.body.title !== blog.title) {
-      updateData.slug = slugify(req.body.title, { 
-        lower: true, 
-        strict: true,
-        remove: /[*+~.()'"!:@]/g
-      });
-    }
-
     // If new image is uploaded
     if (req.file) {
       // Delete old image from Cloudinary
@@ -178,9 +160,8 @@ export const getFeaturedBlogs = async (req, res) => {
   }
 };
 
-// @desc    Get a single blog by slug
-// @route   GET /api/blogs/:slug
-// controllers/blogController.js
+// @desc    Get a single blog by ID
+// @route   GET /api/blogs/id/:id
 export const getBlogById = async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
@@ -196,10 +177,6 @@ export const getBlogById = async (req, res) => {
     });
   }
 };
-
-// @desc    Update a blog
-// @route   PUT /api/blogs/:id
-
 
 // @desc    Delete a blog
 // @route   DELETE /api/blogs/:id
