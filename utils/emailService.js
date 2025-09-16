@@ -1,13 +1,32 @@
 // utils/emailService.js
 import nodemailer from 'nodemailer';
 
-// Configure nodemailer
+// Configure nodemailer with Render-optimized settings
 const transporter = nodemailer.createTransport({
-  service: 'gmail', // or your email service
+  host: 'smtp.gmail.com',
+  port: 587,
+  secure: false, // Use TLS
+  requireTLS: true,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
+  connectionTimeout: 30000, // 30 seconds
+  socketTimeout: 30000, // 30 seconds
+  greetingTimeout: 30000, // 30 seconds
+  dnsTimeout: 30000, // 30 seconds
+  tls: {
+    rejectUnauthorized: false // May help with certificate issues
+  }
+});
+
+// Verify connection configuration
+transporter.verify(function(error, success) {
+  if (error) {
+    console.log('Email transporter verification error:', error);
+  } else {
+    console.log('Email transporter is ready to send messages');
+  }
 });
 
 export const sendOtpEmail = async (email, otp) => {
@@ -29,7 +48,13 @@ export const sendOtpEmail = async (email, otp) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    // Add timeout to the sendMail operation
+    const emailPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Email sending timeout')), 25000);
+    });
+    
+    await Promise.race([emailPromise, timeoutPromise]);
     return true;
   } catch (error) {
     console.error('Error sending OTP email:', error);
@@ -62,7 +87,12 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    const emailPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Email sending timeout')), 25000);
+    });
+    
+    await Promise.race([emailPromise, timeoutPromise]);
     return true;
   } catch (error) {
     console.error('Error sending password reset email:', error);
@@ -85,7 +115,12 @@ export const sendPasswordChangedEmail = async (email) => {
       `,
     };
 
-    await transporter.sendMail(mailOptions);
+    const emailPromise = transporter.sendMail(mailOptions);
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Email sending timeout')), 25000);
+    });
+    
+    await Promise.race([emailPromise, timeoutPromise]);
     return true;
   } catch (error) {
     console.error('Error sending password changed email:', error);
