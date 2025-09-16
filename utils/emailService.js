@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendOtpEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'College Forms <onboarding@resend.dev>', // Update with your verified domain
+      from: 'College Forms <collegeforms.in>', // Update with your verified domain
       to: email,
       subject: 'Your OTP for College Form Registration',
       html: `
