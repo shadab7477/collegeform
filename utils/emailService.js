@@ -1,38 +1,13 @@
 // utils/emailService.js
-import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
-// Configure nodemailer with Render-optimized settings
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // Use TLS
-  requireTLS: true,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  connectionTimeout: 30000, // 30 seconds
-  socketTimeout: 30000, // 30 seconds
-  greetingTimeout: 30000, // 30 seconds
-  dnsTimeout: 30000, // 30 seconds
-  tls: {
-    rejectUnauthorized: false // May help with certificate issues
-  }
-});
-
-// Verify connection configuration
-transporter.verify(function(error, success) {
-  if (error) {
-    console.log('Email transporter verification error:', error);
-  } else {
-    console.log('Email transporter is ready to send messages');
-  }
-});
+// Initialize Resend with your API key
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendOtpEmail = async (email, otp) => {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    const { data, error } = await resend.emails.send({
+      from: 'College Forms <onboarding@resend.dev>', // Update with your verified domain
       to: email,
       subject: 'Your OTP for College Form Registration',
       html: `
@@ -46,15 +21,14 @@ export const sendOtpEmail = async (email, otp) => {
           <p>If you didn't request this, please ignore this email.</p>
         </div>
       `,
-    };
-
-    // Add timeout to the sendMail operation
-    const emailPromise = transporter.sendMail(mailOptions);
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Email sending timeout')), 25000);
     });
-    
-    await Promise.race([emailPromise, timeoutPromise]);
+
+    if (error) {
+      console.error('Error sending OTP email:', error);
+      return false;
+    }
+
+    console.log('Email sent successfully:', data);
     return true;
   } catch (error) {
     console.error('Error sending OTP email:', error);
@@ -66,8 +40,8 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
   try {
     const resetUrl = `${process.env.FRONTEND_URL || 'https://collegeforms.in'}/user/reset-password/${resetToken}`;
     
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    const { data, error } = await resend.emails.send({
+      from: 'College Forms <onboarding@resend.dev>', // Update with your verified domain
       to: email,
       subject: 'Password Reset Request - College Form',
       html: `
@@ -85,14 +59,14 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
           <p>If you didn't request a password reset, please ignore this email.</p>
         </div>
       `,
-    };
-
-    const emailPromise = transporter.sendMail(mailOptions);
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Email sending timeout')), 25000);
     });
-    
-    await Promise.race([emailPromise, timeoutPromise]);
+
+    if (error) {
+      console.error('Error sending password reset email:', error);
+      return false;
+    }
+
+    console.log('Password reset email sent successfully:', data);
     return true;
   } catch (error) {
     console.error('Error sending password reset email:', error);
@@ -102,8 +76,8 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
 
 export const sendPasswordChangedEmail = async (email) => {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    const { data, error } = await resend.emails.send({
+      from: 'College Forms <onboarding@resend.dev>', // Update with your verified domain
       to: email,
       subject: 'Password Changed - College Form',
       html: `
@@ -113,14 +87,14 @@ export const sendPasswordChangedEmail = async (email) => {
           <p>If you did not make this change, please contact us immediately.</p>
         </div>
       `,
-    };
-
-    const emailPromise = transporter.sendMail(mailOptions);
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('Email sending timeout')), 25000);
     });
-    
-    await Promise.race([emailPromise, timeoutPromise]);
+
+    if (error) {
+      console.error('Error sending password changed email:', error);
+      return false;
+    }
+
+    console.log('Password changed email sent successfully:', data);
     return true;
   } catch (error) {
     console.error('Error sending password changed email:', error);
