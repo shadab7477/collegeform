@@ -3,12 +3,13 @@ import { v2 as cloudinary } from "cloudinary";
 import College from "../models/College.js";
 // @desc    Add a new logo
 // @route   POST /api/logos
+
 export const addLogo = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ message: "No image uploaded" });
     if (!req.body.collegeId) return res.status(400).json({ message: "College ID is required" });
 
-    // Find the college
+    // Find the college by ID (not slug)
     const college = await College.findById(req.body.collegeId);
     if (!college) return res.status(404).json({ message: "College not found" });
 
@@ -21,7 +22,7 @@ export const addLogo = async (req, res) => {
       image: uploadedImage.secure_url,
       publicId: uploadedImage.public_id,
       collegeName: college.name,
-      collegeId: college.slug,
+      collegeId: college._id, // Store the ObjectId, not slug
       discount: req.body.discount,
     });
 
