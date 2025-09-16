@@ -6,11 +6,7 @@ const formProgressSchema = new mongoose.Schema({
     required: true,
     ref: 'User'
   },
-  collegeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: 'College'
-  },
+
   formData: {
     type: Object,
     required: true

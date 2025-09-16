@@ -1,18 +1,50 @@
+// models/Student.js
 import mongoose from "mongoose";
 
+const collegeStatusSchema = new mongoose.Schema({
+  college: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "College",
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
+  },
+  remarks: {
+    type: String,
+    default: ""
+  },
+  updatedAt: {
+    type: Date,
+    default: Date.now
+  }
+});
+
 const studentSchema = new mongoose.Schema({
+  // Add unique application ID
+  applicationId: {
+    type: String,
+    unique: true,
+    required: true
+  },
   name: String,
   number: String,
   dob: Date,
   gender: String,
   aadhar: String,
   course: String,
-  college: {
+  
+  // Store all selected colleges
+  selectedColleges: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "College",  
-    required: true,
-  },
-  collegeName: String,
+    ref: "College"
+  }],
+  
+  // Track status for each college
+  collegeStatuses: [collegeStatusSchema],
+  
   fatherName: String,
   fatherNumber: String,
   email: String,
@@ -44,6 +76,16 @@ const studentSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
+});
+
+// Generate unique application ID before saving
+studentSchema.pre('save', async function(next) {
+  if (this.isNew) {
+    const year = new Date().getFullYear().toString().slice(-2);
+    const count = await mongoose.model('Student').countDocuments();
+    this.applicationId = `APP${year}${(count + 1).toString().padStart(5, '0')}`;
+  }
+  next();
 });
 
 const Student = mongoose.model("Student", studentSchema);

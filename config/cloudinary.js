@@ -24,6 +24,22 @@ const storage = new CloudinaryStorage({
       },
     },
   });
+
+  const documentStorage = new CloudinaryStorage({
+    
+  cloudinary,
+  params: {
+    folder: "college_documents",
+    allowedFormats: ["pdf", "jpg", "png", "jpeg", "webp", "avif"],
+    resource_type: "auto",
+    public_id: (req, file) => {
+      return `${Date.now()}-${file.originalname}`;
+    },
+  },
+});
+
+
+export const uploadDocument = multer({ storage: documentStorage });
   
 const upload = multer({ storage });
 

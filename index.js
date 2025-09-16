@@ -19,10 +19,14 @@ import password from "./routes/password.js";
 import adminUroutes from "./routes/adminUroutes.js";
 import mbanner from "./routes/mbanner.js";
 import blogRoutes from "./routes/blogRoutes.js";
+import testSeriesRoutes from "./routes/testSeriesRoutes.js";
+import adminTestSeriesRoutes from "./routes/adminTestSeriesRoutes.js";
+
 import searchHistoryRoutes from "./routes/searchHistoryRoutes.js";
 import sliderRoutes from "./routes/sliderRoutes.js";
 import exams from "./routes/exams.js";
 import reviewRoutes  from "./routes/reviewRoutes.js";
+import documents  from "./routes/documents.js";
 
 // Load environment variables
 dotenv.config();
@@ -107,6 +111,11 @@ app.use("/api/banners", bannerRoutes);
 app.use("/api/slider", sliderRoutes);
 
 app.use("/api/blogs", blogRoutes);
+app.use("/api/documents", documents);
+
+
+app.use("/api/tests", testSeriesRoutes);
+app.use("/api/admin/tests", adminTestSeriesRoutes);
 
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/auth", authRoutes);
