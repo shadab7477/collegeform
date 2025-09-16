@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendOtpEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'College Forms <collegeforms.in>', // Update with your verified domain
+      from: 'College Forms <noreply@collegeforms.in>', // Use a proper email address from your domain
       to: email,
       subject: 'Your OTP for College Form Registration',
       html: `
@@ -41,7 +41,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
     const resetUrl = `${process.env.FRONTEND_URL || 'https://collegeforms.in'}/user/reset-password/${resetToken}`;
     
     const { data, error } = await resend.emails.send({
-      from: 'College Forms <onboarding@resend.dev>', // Update with your verified domain
+      from: 'College Forms <noreply@collegeforms.in>', // Use your domain email
       to: email,
       subject: 'Password Reset Request - College Form',
       html: `
@@ -77,7 +77,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
 export const sendPasswordChangedEmail = async (email) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'College Forms <onboarding@resend.dev>', // Update with your verified domain
+      from: 'College Forms <noreply@collegeforms.in>', // Use your domain email
       to: email,
       subject: 'Password Changed - College Form',
       html: `
