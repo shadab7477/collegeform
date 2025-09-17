@@ -101,3 +101,43 @@ export const sendPasswordChangedEmail = async (email) => {
     return false;
   }
 };
+
+
+export const sendApplicationNotificationEmail = async (applicationData) => {
+  const { name, number, email, city, course, collegeName, location } = applicationData;
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: 'College Forms <noreply@collegeforms.in>',
+      to: process.env.ADMIN_EMAIL,
+      subject: 'New Application Submitted',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2>New Application Received</h2>
+          <p>A new application has been submitted with the following details:</p>
+          <ul>
+            <li><strong>Name:</strong> ${name}</li>
+            <li><strong>Phone Number:</strong> ${number}</li>
+            <li><strong>Email:</strong> ${email}</li>
+            <li><strong>City:</strong> ${city}</li>
+            <li><strong>Course:</strong> ${course}</li>
+            <li><strong>College Name:</strong> ${collegeName}</li>
+            <li><strong>Location:</strong> ${location}</li>
+          </ul>
+          <p>Please review the application in the system.</p>
+        </div>
+      `,
+    });
+
+    if (error) {
+      console.error('Error sending application notification email:', error);
+      return false;
+    }
+
+    console.log('Application notification email sent successfully:', data);
+    return true;
+  } catch (error) {
+    console.error('Error in sendApplicationNotificationEmail:', error);
+    return false;
+  }
+};

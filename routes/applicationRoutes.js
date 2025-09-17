@@ -2,6 +2,8 @@ import express from 'express';
 import Application from '../models/applicationModel.js'; // Import model
 import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
+
+import { sendApplicationNotificationEmail } from '../utils/emailService.js';
 const router = express.Router();
 
 dotenv.config();
@@ -9,25 +11,12 @@ dotenv.config();
 
 
 
-// Nodemailer transporter setup
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER, // Your Gmail
-    pass: process.env.EMAIL_PASS, // App password (not your regular email password)
-  },
-});
-
-// POST route to handle application form submission
-
-// POST route to handle application form submission
 
 router.post('/', async (req, res) => {
   const { name, number, email, city, course, collegeName, location } = req.body;
-console.log(req.body);
+  console.log(req.body);
 
   try {
-    // Create a new application entry
     const newApplication = new Application({
       name,
       number,
@@ -38,34 +27,19 @@ console.log(req.body);
       location,
     });
 
-    // Save the new application to the database
     const application = await newApplication.save();
 
-    // Email content for admin
-    const mailOptions = {
-      from: email,
-      to: process.env.ADMIN_EMAIL, // Sending email to admin
-      subject: 'New Application Submitted',
-      html: `
-        <h2>New Application Received</h2>
-        <p>A new application has been submitted with the following details:</p>
-        <ul>
-          <li><strong>Name:</strong> ${name}</li>
-          <li><strong>Phone Number:</strong> ${number}</li>
-          <li><strong>Email:</strong> ${email}</li>
-          <li><strong>City:</strong> ${city}</li>
-          <li><strong>Course:</strong> ${course}</li>
-          <li><strong>College Name:</strong> ${collegeName}</li>
-          <li><strong>Location:</strong> ${location}</li>
-        </ul>
-        <p>Please review the application in the system.</p>
-      `,
-    };
+    const emailSent = await sendApplicationNotificationEmail({
+      name,
+      number,
+      email,
+      city,
+      course,
+      collegeName,
+      location,
+    });
 
-    // Send the email to admin
-    const emailResponse = await transporter.sendMail(mailOptions);
-
-    if (emailResponse.accepted.length > 0) {
+    if (emailSent) {
       res.status(201).json({
         application,
         message: 'Application saved and email sent successfully',
