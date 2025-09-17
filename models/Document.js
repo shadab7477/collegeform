@@ -1,4 +1,3 @@
-// models/Document.js
 import mongoose from 'mongoose';
 
 const documentSchema = new mongoose.Schema({
@@ -19,6 +18,18 @@ const documentSchema = new mongoose.Schema({
     type: String,
     enum: ['pending', 'approved', 'rejected'],
     default: 'pending'
+  },
+  publicId: String,
+  uploadedBy: {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true
+    },
+    userName: {
+      type: String,
+      required: true
+    }
   }
 }, {
   timestamps: true

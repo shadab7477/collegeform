@@ -5,6 +5,7 @@ const authMiddleware = async (req, res, next) => {
   try {
     // Extract token from headers
     const token = req.header("Authorization")?.split(" ")[1];
+console.log(token);
 
     if (!token) {
       return res.status(401).json({ message: "No token provided, authorization denied" });
