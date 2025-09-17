@@ -27,7 +27,6 @@ import sliderRoutes from "./routes/sliderRoutes.js";
 import exams from "./routes/exams.js";
 import reviewRoutes  from "./routes/reviewRoutes.js";
 import documents  from "./routes/documents.js";
-import documents  from "./routes/documents.js";
 import sitemapRouter from './routes/sitemap.js';
 // Load environment variables
 dotenv.config();
