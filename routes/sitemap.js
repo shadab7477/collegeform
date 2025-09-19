@@ -2,7 +2,8 @@ import express from 'express';
 import College from '../models/College.js';  // Your College model
 
 const router = express.Router();
-const BASE_URL = 'https://collegeforms.in';
+// Fix BASE_URL logic - use environment variable or default to production URL
+const BASE_URL =   'http://localhost:5000' || 'https://collegeforms.in' ;
 
 let cachedSitemap = null;
 let lastGenerated = 0;
@@ -22,7 +23,10 @@ router.get('/sitemap.xml', async (req, res) => {
         const staticUrls = [
             `${BASE_URL}/`,
             `${BASE_URL}/about`,
-            `${BASE_URL}/contact`
+            `${BASE_URL}/contact`,
+            `${BASE_URL}/contactus`,     // Added
+            `${BASE_URL}/studyabroad`,   // Added
+            `${BASE_URL}/events`         // Added
         ];
 
         let xml = `<?xml version="1.0" encoding="UTF-8"?>\n`;

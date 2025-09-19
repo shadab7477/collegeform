@@ -21,13 +21,13 @@ import mbanner from "./routes/mbanner.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import testSeriesRoutes from "./routes/testSeriesRoutes.js";
 import adminTestSeriesRoutes from "./routes/adminTestSeriesRoutes.js";
-
 import searchHistoryRoutes from "./routes/searchHistoryRoutes.js";
 import sliderRoutes from "./routes/sliderRoutes.js";
 import exams from "./routes/exams.js";
 import reviewRoutes  from "./routes/reviewRoutes.js";
 import documents  from "./routes/documents.js";
 import sitemapRouter from './routes/sitemap.js';
+
 // Load environment variables
 dotenv.config();
 
@@ -42,12 +42,10 @@ const allowedOrigins = [
   "http://localhost:3036",
   "https://collegeforms.in",
   "https://www.collegeforms.in",
-  // Add any staging or testing environments if needed
 ];
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.some(allowed => 
@@ -80,7 +78,7 @@ const corsOptions = {
     "Authorization",
     "X-Total-Count"
   ],
-  maxAge: 86400, // 24 hours
+  maxAge: 86400,
   preflightContinue: false,
   optionsSuccessStatus: 204
 };
@@ -102,24 +100,19 @@ app.use(bodyParser.urlencoded({
 // Serve static files
 app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 
-// API Routes
-app.use("/api/colleges", collegeRoutes);
-
-
-app.use("/api/banners", bannerRoutes);
-
-app.use("/api/slider", sliderRoutes);
-
-app.use("/api/blogs", blogRoutes);
-app.use("/api/documents", documents);
+// Sitemap route - should be placed before other routes to ensure it's accessible
 app.use('/', sitemapRouter);
 
+// API Routes
+app.use("/api/colleges", collegeRoutes);
+app.use("/api/banners", bannerRoutes);
+app.use("/api/slider", sliderRoutes);
+app.use("/api/blogs", blogRoutes);
+app.use("/api/documents", documents);
 app.use("/api/tests", testSeriesRoutes);
 app.use("/api/admin/tests", adminTestSeriesRoutes);
-
 app.use("/api/reviews", reviewRoutes);
 app.use("/api/auth", authRoutes);
-
 app.use("/api/exams", exams);
 app.use("/courses", courseRoutes);
 app.use("/locations", locationRoutes);
@@ -132,11 +125,9 @@ app.use("/api", userauth);
 app.use("/api", password);
 app.use("/api/admin", adminUroutes);
 app.use('/api/students', studentrouter);
+app.use("/api/search", searchHistoryRoutes);
 
-// Health check endpoint
-
-
-
+// Health check endpoints
 app.get("/start", (req, res) => {
   res.status(200).json({ 
     status: "healthy",
@@ -144,6 +135,7 @@ app.get("/start", (req, res) => {
     uptime: process.uptime()
   });
 });
+
 app.get("/ping", (req, res) => {
   res.status(200).json({ 
     status: "healthy",
@@ -151,6 +143,7 @@ app.get("/ping", (req, res) => {
     uptime: process.uptime()
   });
 });
+
 // Default Route
 app.get("/", (req, res) => {
   res.json({
@@ -178,12 +171,6 @@ app.use((err, req, res, next) => {
   });
 });
 
-
-
-// ... other imports and setup
-
-app.use("/api/search", searchHistoryRoutes);
-
 // 404 Handler
 app.use((req, res) => {
   res.status(404).json({
@@ -200,4 +187,5 @@ const ENV = process.env.NODE_ENV || 'development';
 app.listen(PORT, () => {
   console.log(`🚀 Server running in ${ENV} mode on port ${PORT}`);
   console.log(`Allowed CORS origins: ${allowedOrigins.join(', ')}`);
+  console.log(`Sitemap available at: /sitemap.xml`);
 });

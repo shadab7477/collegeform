@@ -208,13 +208,16 @@ router.post("/login", async (req, res) => {
 router.put('/edit-profile', authMiddleware, async (req, res) => {
     try {
         const { name, phone, dob, address, education } = req.body;
+        console.log(req.body)
         const userId = req.user.id;
+console.log(userId);
 
         // Find user by ID
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
+console.log(user);
 
         // Update user fields
         if (name) user.name = name;
@@ -245,8 +248,35 @@ router.put('/edit-profile', authMiddleware, async (req, res) => {
     }
 });
 
+// Change from PUT to GET since you're fetching data
+router.get('/get-user', authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
 
+        // Find user by ID
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
+        // Return user info (excluding password)
+        res.status(200).json({
+            message: "User data retrieved successfully",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                dob: user.dob,
+                address: user.address,
+                education: user.education
+            }
+        });
+    } catch (error) {
+        console.error("User data retrieval error:", error);
+        res.status(500).json({ message: "Error retrieving user data" });
+    }
+});
 
 router.post("/forgot-password", async (req, res) => {
   try {
@@ -343,6 +373,8 @@ router.post("/reset-password/:token", async (req, res) => {
 router.post("/change-password", authMiddleware, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
+    console.log(req.body);
+    
     const userId = req.user.id;
 
     // Find user
