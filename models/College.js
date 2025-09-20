@@ -68,7 +68,7 @@ const CollegeSchema = new mongoose.Schema(
       required: true,
       enum: [
         "Default",
-        "Online-Education",
+        "OnlineEducation",
         "OverseasEducation",
         "vocational-institutes",
         "ScholarshipBasedEducation",

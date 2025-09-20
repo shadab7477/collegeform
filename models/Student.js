@@ -1,4 +1,3 @@
-// models/Student.js
 import mongoose from "mongoose";
 
 const collegeStatusSchema = new mongoose.Schema({
@@ -23,11 +22,9 @@ const collegeStatusSchema = new mongoose.Schema({
 });
 
 const studentSchema = new mongoose.Schema({
-  // Add unique application ID
   applicationId: {
     type: String,
-    unique: true,
-    required: true
+    unique: true
   },
   name: String,
   number: String,
@@ -36,13 +33,11 @@ const studentSchema = new mongoose.Schema({
   aadhar: String,
   course: String,
   
-  // Store all selected colleges
   selectedColleges: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "College"
   }],
   
-  // Track status for each college
   collegeStatuses: [collegeStatusSchema],
   
   fatherName: String,
@@ -80,10 +75,26 @@ const studentSchema = new mongoose.Schema({
 
 // Generate unique application ID before saving
 studentSchema.pre('save', async function(next) {
-  if (this.isNew) {
-    const year = new Date().getFullYear().toString().slice(-2);
-    const count = await mongoose.model('Student').countDocuments();
-    this.applicationId = `APP${year}${(count + 1).toString().padStart(5, '0')}`;
+  if (this.isNew && !this.applicationId) {
+    const generateApplicationId = () => {
+      const prefix = 'CF';
+      const timestamp = Date.now().toString().slice(-6);
+      const random = Math.floor(1000 + Math.random() * 9000);
+      return `${prefix}${timestamp}${random}`;
+    };
+    
+    let isUnique = false;
+    let applicationId;
+    
+    while (!isUnique) {
+      applicationId = generateApplicationId();
+      const existing = await mongoose.model('Student').findOne({ applicationId });
+      if (!existing) {
+        isUnique = true;
+      }
+    }
+    
+    this.applicationId = applicationId;
   }
   next();
 });

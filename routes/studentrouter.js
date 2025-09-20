@@ -3,7 +3,6 @@ import {
   getAllStudents,
   getStudentById,
   submitStudentForm,
-  updateStudent,
   saveFormProgress,
   getFormProgress,
   clearFormProgress,
@@ -39,7 +38,6 @@ router.get('/application/:applicationId', getApplicationById);
 
 // Student by ID
 router.get('/:id', getStudentById);
-router.put('/update/:id', updateStudent);
 
 // Course and college routes
 router.get('/perticular-course', async (req, res) => {
