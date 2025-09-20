@@ -144,14 +144,6 @@ app.get("/ping", (req, res) => {
   });
 });
 
-// Default Route
-app.get("/", (req, res) => {
-  res.json({
-    message: "College API Running",
-    version: "1.0.0",
-    environment: process.env.NODE_ENV || "development"
-  });
-});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
