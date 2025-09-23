@@ -18,7 +18,7 @@ async function generateSitemap() {
 
   xml += "</urlset>";
 
-  fs.writeFileSync("../frontend/public/sitemap.xml", xml);
+  fs.writeFileSync("../sitemap.xml", xml);
   console.log("✅ Sitemap generated in frontend/public/sitemap.xml");
 }
 
