@@ -8,7 +8,7 @@ const courseSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['UG', 'PG'],
+    enum: ['UG', 'PG', 'Certification/Diploma'],
     default: 'UG'
   },
   specializations: [{
