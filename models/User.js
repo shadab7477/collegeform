@@ -1,4 +1,3 @@
-// models/User.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -17,6 +16,14 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String,
         required: true,
+    },
+    city: {
+        type: String,
+        required: false
+    },
+    course: {
+        type: String,
+        required: false
     },
     dob: {
         type: Date,

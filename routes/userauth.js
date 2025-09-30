@@ -67,9 +67,10 @@ router.post("/send-otp", async (req, res) => {
 });
 
 // Verify OTP and complete registration
+// Verify OTP and complete registration
 router.post("/verify-otp", async (req, res) => {
   try {
-    const { email, otp, name, phone, password } = req.body;
+    const { email, otp, name, phone, password, city, course } = req.body;
 
     // Find user with matching OTP
     const user = await User.findOne({ 
@@ -92,6 +93,11 @@ router.post("/verify-otp", async (req, res) => {
     user.isVerified = true;
     user.otp = null;
     user.otpExpires = null;
+    
+    // Add new fields
+    if (city) user.city = city;
+    if (course) user.course = course;
+    
     await user.save();
 
     // Generate JWT
@@ -108,6 +114,8 @@ router.post("/verify-otp", async (req, res) => {
         name: user.name,
         email: user.email,
         phone: user.phone,
+        city: user.city,
+        course: user.course,
         dob: user.dob,
         address: user.address,
         education: user.education
