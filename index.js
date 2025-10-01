@@ -28,12 +28,13 @@ import reviewRoutes  from "./routes/reviewRoutes.js";
 import documents  from "./routes/documents.js";
 import sitemapRouter from "./routes/sitemap.js";
 
+import { startCleanupService } from './services/cleanupService.js';
 // Load environment variables
 dotenv.config();
 
 // Database connection
 connectDB();
-
+ startCleanupService();
 const app = express();
 
 // Enhanced CORS configuration
@@ -121,7 +122,7 @@ app.use("/api/applications", applicationRoutes);
 app.use("/api/mbanner", mbanner);
 app.use('/specializations', specializationRoutes);
 app.use('/priceRanges', priceRangeRoutes);
-app.use("/api", userauth);
+app.use("/api/auth", userauth);
 app.use("/api", password);
 app.use("/api/admin", adminUroutes);
 app.use('/api/students', studentrouter);

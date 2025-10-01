@@ -414,4 +414,23 @@ router.post("/change-password", authMiddleware, async (req, res) => {
   }
 });
 
+
+
+
+// Cleanup expired OTPs (optional - can run as cron job)
+const cleanupExpiredOtps = async () => {
+  try {
+    const result = await User.deleteMany({
+      isVerified: false,
+      otpExpires: { $lt: new Date() }
+    });
+    console.log(`Cleaned up ${result.deletedCount} expired OTP records`);
+  } catch (error) {
+    console.error("Cleanup Error:", error);
+  }
+};
+
+// Run cleanup every hour (optional)
+setInterval(cleanupExpiredOtps, 60 * 60 * 1000);
+
 export default router;
