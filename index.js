@@ -29,13 +29,25 @@ import documents  from "./routes/documents.js";
 import sitemapRouter from "./routes/sitemap.js";
 
 import { startCleanupService } from './services/cleanupService.js';
+
+// 👉 Add prerender-node
+import prerender from "prerender-node";
+
 // Load environment variables
 dotenv.config();
 
 // Database connection
 connectDB();
- startCleanupService();
+startCleanupService();
+
 const app = express();
+
+// ✅ Prerender middleware (Google ko static HTML serve karega)
+app.use(
+  prerender
+    .set("prerenderToken", "hgXlNw2uPFrYM9J4FLoZ")
+    .blacklisted("api") // API routes skip
+);
 
 // Enhanced CORS configuration
 const allowedOrigins = [
@@ -87,7 +99,7 @@ const corsOptions = {
 // Apply CORS middleware
 app.use(cors(corsOptions));
 
-// Explicit OPTIONS handler for all routes
+// Explicit OPTIONS handler
 app.options('*', cors(corsOptions));
 
 // Body parser middleware
@@ -101,7 +113,7 @@ app.use(bodyParser.urlencoded({
 // Serve static files
 app.use("/uploads", express.static(path.join(path.resolve(), "uploads")));
 
-// Sitemap route - should be placed before other routes to ensure it's accessible
+// Sitemap route
 app.use('/', sitemapRouter);
 
 // API Routes
@@ -128,7 +140,7 @@ app.use("/api/admin", adminUroutes);
 app.use('/api/students', studentrouter);
 app.use("/api/search", searchHistoryRoutes);
 
-// Health check endpoints
+// Health check
 app.get("/start", (req, res) => {
   res.status(200).json({ 
     status: "healthy",
@@ -145,8 +157,7 @@ app.get("/ping", (req, res) => {
   });
 });
 
-
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   
@@ -172,13 +183,13 @@ app.use((req, res) => {
   });
 });
 
-// Server configuration
+// Server config
 const PORT = process.env.PORT || 5000;
 const ENV = process.env.NODE_ENV || 'development';
 
-// Start Server
 app.listen(PORT, () => {
   console.log(`🚀 Server running in ${ENV} mode on port ${PORT}`);
   console.log(`Allowed CORS origins: ${allowedOrigins.join(', ')}`);
   console.log(`Sitemap available at: /sitemap.xml`);
+  console.log(`✅ Prerender.io enabled with token hgXlNw2uPFrYM9J4FLoZ`);
 });
