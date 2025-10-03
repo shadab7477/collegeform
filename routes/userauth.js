@@ -173,9 +173,13 @@ router.post("/resend-otp", async (req, res) => {
 });
 
 // Login User
-router.post("/login", async (req, res) => {
+router.post("/user/login", async (req, res) => {
   try {
+
+    console.log("yess");
+    
     const { email, password } = req.body;
+console.log(req.body);
 
     // Check if user exists and is verified
     const user = await User.findOne({ email, isVerified: true });
