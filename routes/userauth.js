@@ -6,6 +6,7 @@ import crypto from "crypto";
 import User from "../models/User.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import { sendOtpEmail, sendPasswordResetEmail, sendPasswordChangedEmail } from "../utils/emailService.js";
+
 const router = express.Router();
 
 // Generate OTP
@@ -66,7 +67,6 @@ router.post("/send-otp", async (req, res) => {
   }
 });
 
-// Verify OTP and complete registration
 // Verify OTP and complete registration
 router.post("/verify-otp", async (req, res) => {
   try {
@@ -172,7 +172,7 @@ router.post("/resend-otp", async (req, res) => {
   }
 });
 
-// Login User (existing route)
+// Login User
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -218,14 +218,14 @@ router.put('/edit-profile', authMiddleware, async (req, res) => {
         const { name, phone, dob, address, education } = req.body;
         console.log(req.body)
         const userId = req.user.id;
-console.log(userId);
+        console.log(userId);
 
         // Find user by ID
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
-console.log(user);
+        console.log(user);
 
         // Update user fields
         if (name) user.name = name;
@@ -256,7 +256,7 @@ console.log(user);
     }
 });
 
-// Change from PUT to GET since you're fetching data
+// Get User Data
 router.get('/get-user', authMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
@@ -286,15 +286,20 @@ router.get('/get-user', authMiddleware, async (req, res) => {
     }
 });
 
+// Forgot Password - FIXED
 router.post("/forgot-password", async (req, res) => {
   try {
     const { email } = req.body;
+    console.log("Forgot password request for:", email);
 
     // Check if user exists
     const user = await User.findOne({ email, isVerified: true });
     if (!user) {
       // Don't reveal if user exists or not for security
-      return res.status(200).json({ message: "If the email exists, a reset link will be sent" });
+      return res.status(200).json({ 
+        success: true,
+        message: "If the email exists, a reset link will be sent" 
+      });
     }
 
     // Generate reset token
@@ -306,24 +311,36 @@ router.post("/forgot-password", async (req, res) => {
     user.resetPasswordExpires = resetTokenExpiry;
     await user.save();
 
+    console.log("Reset token generated for:", email);
+
     // Send reset email
     const emailSent = await sendPasswordResetEmail(email, resetToken);
     
     if (!emailSent) {
-      return res.status(500).json({ message: "Failed to send reset email" });
+      return res.status(500).json({ 
+        success: false,
+        message: "Failed to send reset email" 
+      });
     }
 
-    res.status(200).json({ message: "Password reset link sent to your email" });
+    res.status(200).json({ 
+      success: true,
+      message: "Password reset link sent to your email" 
+    });
   } catch (error) {
     console.error("Forgot Password Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ 
+      success: false,
+      message: "Server error" 
+    });
   }
 });
 
-// Reset Password - Verify token and show reset form
+// Reset Password - Verify token and show reset form - FIXED
 router.get("/reset-password/:token", async (req, res) => {
   try {
     const { token } = req.params;
+    console.log("Token verification request:", token);
 
     // Find user with valid reset token
     const user = await User.findOne({
@@ -331,23 +348,37 @@ router.get("/reset-password/:token", async (req, res) => {
       resetPasswordExpires: { $gt: Date.now() }
     });
 
+    console.log("User found:", user ? user.email : "No user found");
+
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired reset token" });
+      return res.status(400).json({ 
+        success: false,
+        message: "Invalid or expired reset token" 
+      });
     }
 
-    res.status(200).json({ message: "Token is valid", email: user.email });
+    res.status(200).json({ 
+      success: true,
+      message: "Token is valid", 
+      email: user.email 
+    });
   } catch (error) {
     console.error("Reset Password Token Check Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ 
+      success: false,
+      message: "Server error" 
+    });
   }
 });
 
-// Reset Password - Update password
+// Reset Password - Update password - FIXED
 router.post("/reset-password/:token", async (req, res) => {
   try {
     const { token } = req.params;
     const { password } = req.body;
 
+    console.log("Reset password request for token:", token);
+
     // Find user with valid reset token
     const user = await User.findOne({
       resetPasswordToken: token,
@@ -355,7 +386,10 @@ router.post("/reset-password/:token", async (req, res) => {
     });
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired reset token" });
+      return res.status(400).json({ 
+        success: false,
+        message: "Invalid or expired reset token" 
+      });
     }
 
     // Hash new password
@@ -363,17 +397,25 @@ router.post("/reset-password/:token", async (req, res) => {
 
     // Update password and clear reset token
     user.password = hashedPassword;
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
     await user.save();
+
+    console.log("Password reset successfully for:", user.email);
 
     // Send confirmation email
     await sendPasswordChangedEmail(user.email);
 
-    res.status(200).json({ message: "Password reset successfully" });
+    res.status(200).json({ 
+      success: true,
+      message: "Password reset successfully" 
+    });
   } catch (error) {
     console.error("Reset Password Error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ 
+      success: false,
+      message: "Server error" 
+    });
   }
 });
 
@@ -413,9 +455,6 @@ router.post("/change-password", authMiddleware, async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-
-
-
 
 // Cleanup expired OTPs (optional - can run as cron job)
 const cleanupExpiredOtps = async () => {

@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const sendOtpEmail = async (email, otp) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'College Forms <noreply@collegeforms.in>', // Use a proper email address from your domain
+      from: 'College Forms <noreply@collegeforms.in>',
       to: email,
       subject: 'Your OTP for College Form Registration',
       html: `
@@ -38,25 +38,40 @@ export const sendOtpEmail = async (email, otp) => {
 
 export const sendPasswordResetEmail = async (email, resetToken) => {
   try {
-    const resetUrl = `${process.env.FRONTEND_URL || 'https://collegeforms.in'}/user/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
     
+    console.log("Sending reset email to:", email);
+    console.log("Reset URL:", resetUrl);
+
     const { data, error } = await resend.emails.send({
-      from: 'College Forms <noreply@collegeforms.in>', // Use your domain email
+      from: 'College Forms <noreply@collegeforms.in>',
       to: email,
       subject: 'Password Reset Request - College Form',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #333;">Password Reset Request</h2>
-          <p>You requested to reset your password. Click the button below to reset it:</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Password Reset Request</h2>
+          <p>Hello,</p>
+          <p>You requested to reset your password for your College Form account. Click the button below to reset it:</p>
+          
           <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+            <a href="${resetUrl}" 
+               style="background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-size: 16px; font-weight: bold;">
               Reset Password
             </a>
           </div>
+          
           <p>Or copy and paste this link in your browser:</p>
-          <p style="word-break: break-all; color: #007bff;">${resetUrl}</p>
-          <p>This link will expire in 1 hour.</p>
-          <p>If you didn't request a password reset, please ignore this email.</p>
+          <p style="background-color: #f8f9fa; padding: 10px; border-radius: 5px; word-break: break-all; font-size: 14px;">
+            ${resetUrl}
+          </p>
+          
+          <p><strong>This link will expire in 1 hour.</strong></p>
+          
+          <p>If you didn't request a password reset, please ignore this email. Your account remains secure.</p>
+          
+          <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #666; font-size: 12px;">
+            <p>Best regards,<br>College Form Team</p>
+          </div>
         </div>
       `,
     });
@@ -66,10 +81,10 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
       return false;
     }
 
-    console.log('Password reset email sent successfully:', data);
+    console.log('Password reset email sent successfully to:', email);
     return true;
   } catch (error) {
-    console.error('Error sending password reset email:', error);
+    console.error('Error in sendPasswordResetEmail:', error);
     return false;
   }
 };
@@ -77,7 +92,7 @@ export const sendPasswordResetEmail = async (email, resetToken) => {
 export const sendPasswordChangedEmail = async (email) => {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'College Forms <noreply@collegeforms.in>', // Use your domain email
+      from: 'College Forms <noreply@collegeforms.in>',
       to: email,
       subject: 'Password Changed - College Form',
       html: `
@@ -101,7 +116,6 @@ export const sendPasswordChangedEmail = async (email) => {
     return false;
   }
 };
-
 
 export const sendApplicationNotificationEmail = async (applicationData) => {
   const { name, number, email, city, course, collegeName, location } = applicationData;
