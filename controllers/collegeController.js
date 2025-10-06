@@ -186,12 +186,10 @@ export const editCollege = async (req, res) => {
 // @route   GET /api/colleges
 export const getColleges = async (req, res) => {
   try {
-    const colleges = await College.find().sort({ createdAt: -1 });
-    res.json({
-      success: true,
-      count: colleges.length,
-      colleges
-    });
+    const data = await College.find().sort({ createdAt: -1 });
+    res.json(
+      data
+    );
   } catch (error) {
     console.error("Error fetching colleges:", error);
     res.status(500).json({ 
