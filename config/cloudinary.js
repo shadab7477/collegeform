@@ -12,6 +12,9 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+
+console.log("storing image");
+
 // Image storage setup
 const imageStorage = new CloudinaryStorage({
   cloudinary,
