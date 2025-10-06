@@ -12,7 +12,7 @@ const FIXED_USERNAME = process.env.FIXED_USERNAME;
 const FIXED_PASSWORD = process.env.FIXED_PASSWORD;
 
 // Login route
-router.post("/login", (req, res) => {
+router.post("/admin/login", (req, res) => {
     const { username, password } = req.body;
 
     if (username === FIXED_USERNAME && password === FIXED_PASSWORD) {
