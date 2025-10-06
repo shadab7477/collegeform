@@ -7,6 +7,11 @@ const logoSchema = new mongoose.Schema({
   collegeName: { type: String, required: true },
   collegeId: { type: mongoose.Schema.Types.ObjectId, ref: 'College', required: true },
   discount: { type: String },
+  slug: {
+      type: String,
+      unique: true,
+      index: true,
+    },
 }, { timestamps: true });
 
 export default mongoose.model("Logo", logoSchema);

@@ -23,6 +23,8 @@ export const addLogo = async (req, res) => {
       publicId: uploadedImage.public_id,
       collegeName: college.name,
       collegeId: college._id, // Store the ObjectId, not slug
+      slug: college.slug, // Store the ObjectId, not slug
+
       discount: req.body.discount,
     });
 
