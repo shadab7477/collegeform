@@ -11,7 +11,6 @@ const searchHistorySchema = new mongoose.Schema({
     specialization: String,
     location: String,
     examAccepted: String,
-    educationLevel: String,
     educationMode: String,
     feesRange: String,
     feesPaymentMode: String
