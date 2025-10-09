@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import slugify from "slugify";
 
 const blogSchema = new mongoose.Schema({
   title: {
@@ -16,53 +15,47 @@ const blogSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  excerpt: {
+    type: String
+  },
   image: {
     type: String,
     required: true
   },
   publicId: {
-    type: String,
-    required: true
+    type: String
   },
   category: {
     type: String,
-    required: true,
-    enum: ['Technology', 'Education', 'Health', 'Business', 'Entertainment']
+    required: true
   },
   author: {
     type: String,
     required: true
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  },
-  excerpt: {
-    type: String,
-  },
   isFeatured: {
     type: Boolean,
     default: false
-  }
+  },
+  faqs: [{
+    question: String,
+    answer: String
+  }]
+}, {
+  timestamps: true
 });
 
-// Middleware to generate slug before saving
+// Generate slug before saving
 blogSchema.pre('save', function(next) {
-  if (this.isModified('title') || this.isNew) {
-    this.slug = slugify(this.title, { 
-      lower: true, 
-      strict: true,
-      remove: /[*+~.()'"!:@]/g
-    });
+  if (this.isModified('title')) {
+    this.slug = this.title
+      .toLowerCase()
+      .replace(/[^a-zA-Z0-9]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
   }
-  this.updatedAt = Date.now();
   next();
 });
 
-const Blog = mongoose.model('Blog', blogSchema);
-
+const Blog = mongoose.model("Blog", blogSchema);
 export default Blog;

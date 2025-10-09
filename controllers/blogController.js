@@ -4,11 +4,12 @@ import { v2 as cloudinary } from "cloudinary";
 // @desc    Create a new blog
 // @route   POST /api/blogs
 export const createBlog = async (req, res) => {
-  
   try {
     if (!req.file) {
       return res.status(400).json({ message: "No image uploaded" });
     }
+    console.log(req.body);
+    
 
     // Upload image to Cloudinary
     const uploadedImage = await cloudinary.uploader.upload(req.file.path, {
@@ -16,7 +17,17 @@ export const createBlog = async (req, res) => {
     });
 
     // Generate excerpt from content
-    const excerpt = req.body.content.substring(0, 160) + (req.body.content.length > 560 ? "..." : "");
+    const excerpt = req.body.content.substring(0, 160) + (req.body.content.length > 160 ? "..." : "");
+
+    // Parse FAQs from request body
+    let faqs = [];
+    if (req.body.faqs) {
+      try {
+        faqs = JSON.parse(req.body.faqs);
+      } catch (error) {
+        console.error("Error parsing FAQs:", error);
+      }
+    }
 
     const newBlog = new Blog({
       title: req.body.title,
@@ -26,7 +37,8 @@ export const createBlog = async (req, res) => {
       category: req.body.category,
       author: req.body.author,
       excerpt: excerpt,
-      isFeatured: req.body.isFeatured === 'true'
+      isFeatured: req.body.isFeatured === 'true',
+      faqs: faqs
     });
 
     const savedBlog = await newBlog.save();
@@ -98,12 +110,23 @@ export const updateBlog = async (req, res) => {
       return res.status(404).json({ message: "Blog not found" });
     }
 
+    // Parse FAQs from request body
+    let faqs = blog.faqs;
+    if (req.body.faqs) {
+      try {
+        faqs = JSON.parse(req.body.faqs);
+      } catch (error) {
+        console.error("Error parsing FAQs:", error);
+      }
+    }
+
     let updateData = {
       title: req.body.title || blog.title,
       content: req.body.content || blog.content,
       category: req.body.category || blog.category,
       author: req.body.author || blog.author,
       isFeatured: req.body.isFeatured ? req.body.isFeatured === 'true' : blog.isFeatured,
+      faqs: faqs,
       updatedAt: Date.now()
     };
 

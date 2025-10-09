@@ -27,6 +27,8 @@ import exams from "./routes/exams.js";
 import reviewRoutes  from "./routes/reviewRoutes.js";
 import documents  from "./routes/documents.js";
 import sitemapRouter from "./routes/sitemap.js";
+import faqRoutes from "./routes/faq.js";
+import upload from "./routes/upload.js";
 
 import { startCleanupService } from './services/cleanupService.js';
 
@@ -121,6 +123,8 @@ app.use("/api/colleges", collegeRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/slider", sliderRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/upload", upload);
+
 app.use("/api/documents", documents);
 app.use("/api/tests", testSeriesRoutes);
 app.use("/api/admin/tests", adminTestSeriesRoutes);
@@ -140,6 +144,7 @@ app.use("/api/admin", adminUroutes);
 app.use('/api/students', studentrouter);
 app.use("/api/search", searchHistoryRoutes);
 
+app.use("/api/faqs", faqRoutes);
 // Health check
 app.get("/start", (req, res) => {
   res.status(200).json({ 

@@ -1,5 +1,5 @@
 import express from "express";
-import { uploadImage } from '../config/cloudinary.js';
+import { uploadBlogImage } from '../config/cloudinary.js';
 import { 
   createBlog, 
   getAllBlogs, 
@@ -13,7 +13,7 @@ import {
 const router = express.Router();
 
 // Create a new blog
-router.post("/", uploadImage.single("image"), createBlog);
+router.post("/", uploadBlogImage.single("image"), createBlog);
 
 // Get all blogs
 router.get("/", getAllBlogs);
@@ -28,7 +28,7 @@ router.get("/:slug", getBlogBySlug);
 router.get("/id/:id", getBlogById);
 
 // Update a blog
-router.put("/:id", uploadImage.single("image"), updateBlog);
+router.put("/:id", uploadBlogImage.single("image"), updateBlog);
 
 // Delete a blog
 router.delete("/:id", deleteBlog);
