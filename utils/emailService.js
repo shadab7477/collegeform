@@ -38,7 +38,7 @@ export const sendOtpEmail = async (email, otp) => {
 
 export const sendPasswordResetEmail = async (email, resetToken) => {
   try {
-    const resetUrl = `${process.env.FRONTEND_URL || 'collegeforms.in'}/reset-password/${resetToken}`;
+    const resetUrl = `${process.env.FRONTEND_URL || 'collegeforms.in'}/user/reset-password/${resetToken}`;
     
     console.log("Sending reset email to:", email);
     console.log("Reset URL:", resetUrl);
