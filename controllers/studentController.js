@@ -6,8 +6,8 @@ import mongoose from "mongoose";
 export const getAllStudents = async (req, res) => {
   try {
     const students = await Student.find()
-      .populate('selectedColleges', 'name')
-      .populate('collegeStatuses.college', 'name');
+      .populate('selectedColleges.collegeId', 'name slug')
+      .populate('collegeStatuses.college', 'name slug');
     res.status(200).json(students);
   } catch (error) {
     res.status(500).json({ message: 'Error fetching student data', error });
@@ -15,12 +15,11 @@ export const getAllStudents = async (req, res) => {
 };
 
 // Get student by ID
-
 export const getStudentById = async (req, res) => {
   try {
     const students = await Student.find({ userId: req.params.id })
-      .populate('selectedColleges', 'name')
-      .populate('collegeStatuses.college', 'name')
+      .populate('selectedColleges.collegeId', 'name slug')
+      .populate('collegeStatuses.college', 'name slug')
       .populate('userId', 'name email');
     
     if (!students || students.length === 0) {
@@ -34,8 +33,6 @@ export const getStudentById = async (req, res) => {
 };
 
 // Submit student form
-// Submit student form
-
 export const submitStudentForm = async (req, res) => {
   try {
     const {
@@ -47,6 +44,20 @@ export const submitStudentForm = async (req, res) => {
       percentageGraduation, cgpaGraduation, isGraduation
     } = req.body;
 
+    // Convert selectedColleges array to include both collegeId and college details
+    const collegeSelections = selectedColleges.map(college => ({
+      collegeId: college.id,
+      collegeName: college.name,
+      collegeSlug: college.slug
+    }));
+
+    // Create college statuses for tracking
+    const collegeStatuses = selectedColleges.map(college => ({
+      college: college.id,
+      status: 'pending',
+      remarks: ''
+    }));
+
     // Create a single student record with all selected colleges
     const newStudent = new Student({ 
       name,
@@ -55,7 +66,7 @@ export const submitStudentForm = async (req, res) => {
       gender,
       aadhar,
       course,
-      selectedColleges,
+      selectedColleges: collegeSelections,
       fatherName,
       fatherNumber,
       email,
@@ -79,12 +90,7 @@ export const submitStudentForm = async (req, res) => {
       cgpaGraduation: cgpaGraduation || null,
       isGraduation: isGraduation || false,
       userId: req.user.id || req.user._id,
-      // Add college-specific status tracking
-      collegeStatuses: selectedColleges.map(collegeId => ({
-        college: collegeId,
-        status: 'pending', // Default status
-        remarks: ''
-      }))
+      collegeStatuses: collegeStatuses
     });
 
     await newStudent.save();
@@ -154,8 +160,8 @@ export const getApplicationsByCollege = async (req, res) => {
       'collegeStatuses.college': collegeId
     })
     .populate('userId', 'name email')
-    .populate('selectedColleges', 'name')
-    .populate('collegeStatuses.college', 'name');
+    .populate('selectedColleges.collegeId', 'name slug')
+    .populate('collegeStatuses.college', 'name slug');
     
     // Filter and format the response to show only relevant college status
     const formattedApplications = applications.map(app => {
@@ -199,8 +205,8 @@ export const getApplicationsByCollegeAndStatus = async (req, res) => {
       'collegeStatuses.status': status
     })
     .populate('userId', 'name email')
-    .populate('selectedColleges', 'name')
-    .populate('collegeStatuses.college', 'name');
+    .populate('selectedColleges.collegeId', 'name slug')
+    .populate('collegeStatuses.college', 'name slug');
     
     const formattedApplications = applications.map(app => {
       const collegeStatus = app.collegeStatuses.find(
@@ -273,8 +279,8 @@ export const getApplicationById = async (req, res) => {
     const { applicationId } = req.params;
     
     const application = await Student.findOne({ applicationId })
-      .populate('selectedColleges', 'name')
-      .populate('collegeStatuses.college', 'name')
+      .populate('selectedColleges.collegeId', 'name slug')
+      .populate('collegeStatuses.college', 'name slug')
       .populate('userId', 'name email');
     
     if (!application) {

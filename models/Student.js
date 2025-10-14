@@ -33,9 +33,17 @@ const studentSchema = new mongoose.Schema({
   aadhar: String,
   course: String,
   
-  selectedColleges: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "College"
+ selectedColleges: [{
+    collegeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'College',
+    },
+    collegeName: {
+      type: String,
+    },
+    collegeSlug: {
+      type: String,
+    }
   }],
   
   collegeStatuses: [collegeStatusSchema],
