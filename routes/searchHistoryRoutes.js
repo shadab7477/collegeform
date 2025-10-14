@@ -3,7 +3,8 @@ import {
   saveSearchFilters,
   trackCollegeView,
   getUserSearchHistoryById,
-  getMySearchHistory
+  getMySearchHistory,
+  saveCollegeHistory  // Add this import
 } from "../controllers/searchHistoryController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
@@ -12,6 +13,9 @@ const router = express.Router();
 
 // Save search filters - requires authentication
 router.post("/save-filters", authMiddleware, saveSearchFilters);
+
+// NEW ROUTE: Save college to history - requires authentication
+router.post("/save-college-history", authMiddleware, saveCollegeHistory);
 
 // Track college view - requires authentication
 router.post("/track-view", authMiddleware, trackCollegeView);

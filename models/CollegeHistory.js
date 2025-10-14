@@ -1,46 +1,13 @@
 import mongoose from "mongoose";
 
-const searchHistorySchema = new mongoose.Schema({
+const collegeHistorySchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    unique: true
   },
-  filters: {
-    course: {
-      type: String,
-      default: ''
-    },
-    specialization: {
-      type: String,
-      default: ''
-    },
-    currentCity: {
-      type: String,
-      default: ''
-    },
-    preferredCity: {
-      type: String,
-      default: ''
-    },
-    examAccepted: {
-      type: String,
-      default: ''
-    },
-    educationLevel: {
-      type: String,
-      default: ''
-    },
-    educationMode: {
-      type: String,
-      default: ''
-    }
-  },
-  searchQuery: {
-    type: String,
-    required: true
-  },
-  collegesViewed: [{
+  viewedColleges: [{
     collegeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'College',
@@ -84,10 +51,6 @@ const searchHistorySchema = new mongoose.Schema({
     viewCount: {
       type: Number,
       default: 1
-    },
-    viewedAt: {
-      type: Date,
-      default: Date.now
     }
   }]
 }, {
@@ -95,9 +58,9 @@ const searchHistorySchema = new mongoose.Schema({
 });
 
 // Index for better performance
-searchHistorySchema.index({ user: 1, createdAt: -1 });
-searchHistorySchema.index({ createdAt: -1 });
+collegeHistorySchema.index({ user: 1 });
+collegeHistorySchema.index({ 'viewedColleges.lastViewedAt': -1 });
 
-const SearchHistory = mongoose.model('SearchHistory', searchHistorySchema);
+const CollegeHistory = mongoose.model('CollegeHistory', collegeHistorySchema);
 
-export default SearchHistory;
+export default CollegeHistory;

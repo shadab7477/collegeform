@@ -54,16 +54,97 @@ export const saveSearchFilters = async (req, res) => {
   }
 };
 
-// Helper function to generate a readable search query
-const generateSearchQuery = (filters) => {
-  const parts = [];
-  
-  if (filters.course) parts.push(filters.course);
-  if (filters.specialization) parts.push(`in ${filters.specialization}`);
-  if (filters.preferredCity) parts.push(`near ${filters.preferredCity}`);
-  if (filters.educationLevel) parts.push(`(${filters.educationLevel})`);
-  
-  return parts.join(' ') || 'General college search';
+// NEW FUNCTION: Save college to user's history
+export const saveCollegeHistory = async (req, res) => {
+  try {
+    console.log("Saving college to history:", req.body);
+    
+    const { 
+      collegeId, 
+      collegeName, 
+      collegeImage, 
+      location, 
+      courses, 
+      minFees, 
+      maxFees, 
+      avgPackage 
+    } = req.body;
+    
+    const userId = req.user.id;
+
+    if (!collegeId || !collegeName) {
+      return res.status(400).json({
+        success: false,
+        message: "College ID and name are required"
+      });
+    }
+
+    // Find user's most recent search history or create a new one
+    let searchHistory = await SearchHistory.findOne({ user: userId })
+      .sort({ createdAt: -1 })
+      .limit(1);
+
+    if (!searchHistory) {
+      searchHistory = new SearchHistory({
+        user: userId,
+        filters: {},
+        searchQuery: "College view without search",
+        collegesViewed: []
+      });
+    }
+
+    // Check if college is already in viewed list
+    const existingCollegeIndex = searchHistory.collegesViewed.findIndex(
+      college => college.collegeId && college.collegeId.toString() === collegeId
+    );
+
+    if (existingCollegeIndex !== -1) {
+      // Update existing entry with new view
+      searchHistory.collegesViewed[existingCollegeIndex].lastViewedAt = new Date();
+      searchHistory.collegesViewed[existingCollegeIndex].viewCount += 1;
+      
+      // Update college details if they changed
+      searchHistory.collegesViewed[existingCollegeIndex].collegeName = collegeName;
+      searchHistory.collegesViewed[existingCollegeIndex].collegeImage = collegeImage || '';
+      searchHistory.collegesViewed[existingCollegeIndex].location = location || '';
+      searchHistory.collegesViewed[existingCollegeIndex].courses = courses || [];
+      searchHistory.collegesViewed[existingCollegeIndex].minFees = minFees || 0;
+      searchHistory.collegesViewed[existingCollegeIndex].maxFees = maxFees || 0;
+      searchHistory.collegesViewed[existingCollegeIndex].avgPackage = avgPackage || 0;
+    } else {
+      // Add new college to history
+      searchHistory.collegesViewed.push({
+        collegeId,
+        collegeName,
+        collegeImage: collegeImage || '',
+        location: location || '',
+        courses: courses || [],
+        minFees: minFees || 0,
+        maxFees: maxFees || 0,
+        avgPackage: avgPackage || 0,
+        firstViewedAt: new Date(),
+        lastViewedAt: new Date(),
+        viewCount: 1
+      });
+    }
+
+    await searchHistory.save();
+
+    console.log("College saved to history successfully");
+
+    res.status(200).json({
+      success: true,
+      message: "College saved to history successfully",
+      searchHistory
+    });
+  } catch (error) {
+    console.error("Error saving college to history:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to save college to history",
+      error: error.message
+    });
+  }
 };
 
 // Track college views
@@ -169,4 +250,16 @@ export const getMySearchHistory = async (req, res) => {
       error: error.message
     });
   }
+};
+
+// Helper function to generate a readable search query
+const generateSearchQuery = (filters) => {
+  const parts = [];
+  
+  if (filters.course) parts.push(filters.course);
+  if (filters.specialization) parts.push(`in ${filters.specialization}`);
+  if (filters.preferredCity) parts.push(`near ${filters.preferredCity}`);
+  if (filters.educationLevel) parts.push(`(${filters.educationLevel})`);
+  
+  return parts.join(' ') || 'General college search';
 };
