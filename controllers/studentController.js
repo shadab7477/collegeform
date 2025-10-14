@@ -15,22 +15,7 @@ export const getAllStudents = async (req, res) => {
 };
 
 // Get student by ID
-export const getStudentById = async (req, res) => {
-  try {
-    const students = await Student.find({ userId: req.params.id })
-      .populate('selectedColleges.collegeId', 'name slug')
-      .populate('collegeStatuses.college', 'name slug')
-      .populate('userId', 'name email');
-    
-    if (!students || students.length === 0) {
-      return res.status(404).json({ message: 'No applications found for this user' });
-    }
-    
-    res.json(students);
-  } catch (err) {
-    res.status(500).json({ message: 'Error fetching student data', error: err.message });
-  }
-};
+
 
 // Submit student form
 export const submitStudentForm = async (req, res) => {
@@ -112,6 +97,7 @@ export const submitStudentForm = async (req, res) => {
 export const updateCollegeStatus = async (req, res) => {
   try {
     const { studentId, collegeId, status, remarks } = req.body;
+    console.log(req.body);
     
     // Validate status
     if (!['pending', 'approved', 'rejected'].includes(status)) {
@@ -119,13 +105,15 @@ export const updateCollegeStatus = async (req, res) => {
     }
     
     const student = await Student.findById(studentId);
+    console.log(student);
+    
     if (!student) {
       return res.status(404).json({ message: 'Student not found' });
     }
     
     // Find the college status entry
     const collegeStatus = student.collegeStatuses.find(
-      cs => cs.college.toString() === collegeId
+      cs => cs.college.toString() === collegeId._id
     );
     
     if (!collegeStatus) {

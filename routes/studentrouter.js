@@ -1,7 +1,6 @@
 import express from 'express';
 import {
   getAllStudents,
-  getStudentById,
   submitStudentForm,
   saveFormProgress,
   getFormProgress,
@@ -13,31 +12,29 @@ import {
 } from '../controllers/studentController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import College from "../models/College.js"
-
+import adminMiddleware from '../middleware/adminMiddleware.js';
 const router = express.Router();
 
 // Apply auth middleware to all routes that need authentication
-router.use(authMiddleware);
 
 // Student routes
-router.post('/submit', submitStudentForm);
+router.post('/submit',authMiddleware, submitStudentForm);
 router.get('/students', getAllStudents);
 
 // Form progress routes
-router.get('/progress', getFormProgress);
-router.get('/Allprogress', getAllFormProgress);
-router.post('/save-progress', saveFormProgress);
-router.delete('/clear-progress', clearFormProgress);
+router.get('/progress',authMiddleware, getFormProgress);
+router.get('/Allprogress', authMiddleware, getAllFormProgress);
+router.post('/save-progress',authMiddleware, saveFormProgress);
+router.delete('/clear-progress',authMiddleware, clearFormProgress);
 
 // College status routes
-router.put('/update-college-status', updateCollegeStatus);
-router.get('/college-applications/:collegeId', getApplicationsByCollege);
+router.put('/update-college-status',adminMiddleware, updateCollegeStatus);
+router.get('/college-applications/:collegeId',authMiddleware, getApplicationsByCollege);
 
 // Application ID route
-router.get('/application/:applicationId', getApplicationById);
+router.get('/application/:applicationId',authMiddleware, getApplicationById);
 
 // Student by ID
-router.get('/:id', getStudentById);
 
 // Course and college routes
 router.get('/perticular-course', async (req, res) => {
