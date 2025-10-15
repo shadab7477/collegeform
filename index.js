@@ -29,6 +29,7 @@ import documents  from "./routes/documents.js";
 import sitemapRouter from "./routes/sitemap.js";
 import faqRoutes from "./routes/faq.js";
 import upload from "./routes/upload.js";
+import cartRoutes from "./routes/cartRoutes.js";
 
 import { startCleanupService } from './services/cleanupService.js';
 
@@ -124,6 +125,7 @@ app.use("/api/banners", bannerRoutes);
 app.use("/api/slider", sliderRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/upload", upload);
+app.use("/api/cart", cartRoutes);
 
 app.use("/api/documents", documents);
 app.use("/api/tests", testSeriesRoutes);

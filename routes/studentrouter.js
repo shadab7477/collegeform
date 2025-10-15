@@ -8,7 +8,8 @@ import {
   getAllFormProgress,
   updateCollegeStatus,
   getApplicationsByCollege,
-  getApplicationById
+  getApplicationById,
+  getUserApplications
 } from '../controllers/studentController.js';
 import authMiddleware from '../middleware/authMiddleware.js';
 import College from "../models/College.js"
@@ -20,6 +21,7 @@ const router = express.Router();
 // Student routes
 router.post('/submit',authMiddleware, submitStudentForm);
 router.get('/students', getAllStudents);
+router.get('/my-applications', authMiddleware, getUserApplications);
 
 // Form progress routes
 router.get('/progress',authMiddleware, getFormProgress);

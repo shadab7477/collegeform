@@ -226,6 +226,32 @@ export const getApplicationsByCollegeAndStatus = async (req, res) => {
   }
 };
 
+
+
+// Get all applications submitted by the logged-in user
+export const getUserApplications = async (req, res) => {
+  try {
+    const userId = req.user.id || req.user._id;
+
+    // Find all applications submitted by the user
+    const applications = await Student.find({ userId })
+      .populate('selectedColleges.collegeId', 'name slug')
+      .populate('collegeStatuses.college', 'name slug')
+      .sort({ createdAt: -1 });
+
+    if (!applications || applications.length === 0) {
+      return res.status(404).json({ message: 'No applications found for this user.' });
+    }
+
+    // Send full raw data (no formatting)
+    res.status(200).json(applications);
+  } catch (error) {
+    console.error('Error fetching user applications:', error);
+    res.status(500).json({ message: 'Error fetching user applications', error: error.message });
+  }
+};
+
+
 // Get application statistics for a college
 export const getCollegeApplicationStats = async (req, res) => {
   try {
