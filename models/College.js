@@ -29,12 +29,31 @@ const placementCompanySchema = new mongoose.Schema({
   studentsPlaced: { type: Number }
 });
 
+const requiredDocumentSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  isRequired: { type: Boolean, default: true },
+  description: { type: String }
+});
+
+const keyHighlightSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true }
+});
+
+const placementStatsSchema = new mongoose.Schema({
+  year: { type: Number },
+  averagePackage: { type: Number },
+  highestPackage: { type: Number },
+  placementPercentage: { type: Number }
+});
+
 const collegeSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     slug: { type: String, unique: true, sparse: true },
     location: { type: String, required: true },
     description: { type: String, required: true },
+    shortDescription: { type: String, required: true },
     minFees: { type: Number, required: true },
     maxFees: { type: Number, required: true },
     avgPackage: { type: Number },
@@ -45,8 +64,12 @@ const collegeSchema = new mongoose.Schema(
     collegeType: [{ type: String }],
     category: { type: String, default: "Default" },
     isTopCollege: { type: Boolean, default: false },
+    
+    // Image fields
     image: { type: String, required: true },
+    additionalImages: [{ type: String }],
     imagePublicId: { type: String, required: true },
+    additionalImagesPublicIds: [{ type: String }],
     
     // New fields
     coursePricing: [coursePricingSchema],
@@ -54,17 +77,34 @@ const collegeSchema = new mongoose.Schema(
     importantDates: [importantDatesSchema],
     applicationDeadline: { type: Date },
     entranceExams: [{ type: String }],
-    placementStats: [{
-      year: { type: Number },
-      averagePackage: { type: Number },
-      highestPackage: { type: Number },
-      placementPercentage: { type: Number }
-    }],
+    placementStats: [placementStatsSchema],
     placementCompanies: [placementCompanySchema],
-    placementHighlights: [{ type: String }]
+    placementHighlights: [{ type: String }],
+    
+    // New requested fields
+    keyHighlights: [keyHighlightSchema],
+    requiredDocuments: [requiredDocumentSchema]
   },
   { timestamps: true }
 );
+
+// Default required documents
+collegeSchema.pre("save", function (next) {
+  if (this.isNew && (!this.requiredDocuments || this.requiredDocuments.length === 0)) {
+    this.requiredDocuments = [
+      { name: "10th Mark Sheet", isRequired: true, description: "10th standard mark sheet" },
+      { name: "12th Mark Sheet", isRequired: true, description: "12th standard mark sheet" },
+      { name: "Graduation Mark Sheets (for PG courses)", isRequired: false, description: "Graduation mark sheets for postgraduate courses" },
+      { name: "Transfer Certificate", isRequired: true, description: "Transfer certificate from previous institution" },
+      { name: "Migration Certificate", isRequired: true, description: "Migration certificate" },
+      { name: "Character Certificate", isRequired: true, description: "Character certificate" },
+      { name: "Category Certificate (if applicable)", isRequired: false, description: "Category certificate for reserved categories" },
+      { name: "Passport Size Photographs", isRequired: true, description: "Recent passport size photographs" },
+      { name: "Identity Proof (Aadhar Card/Passport)", isRequired: true, description: "Government issued identity proof" }
+    ];
+  }
+  next();
+});
 
 // Generate slug before saving
 collegeSchema.pre("save", function (next) {

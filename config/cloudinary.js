@@ -12,56 +12,27 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-console.log("storing image");
+console.log("Cloudinary configured successfully");
 
-// Image storage setup
-const imageStorage = new CloudinaryStorage({
+// Create storage for college images
+const createCollegeStorage = () => new CloudinaryStorage({
   cloudinary,
   params: {
     folder: 'college_images',
     allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif'],
-    public_id: (req, file) => `${Date.now()}-${file.originalname}`,
+    public_id: (req, file) => {
+      const timestamp = Date.now();
+      const originalName = file.originalname.replace(/\.[^/.]+$/, ""); // Remove extension
+      return `college-${timestamp}-${originalName}`;
+    },
   },
 });
 
-// Document storage setup
-const documentStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'college_documents',
-    allowed_formats: ['pdf', 'jpg', 'png', 'jpeg', 'webp', 'avif'],
-    resource_type: 'auto',
-    public_id: (req, file) => `${Date.now()}-${file.originalname}`,
-  },
-});
-
-// Blog images storage setup (for blog cover images)
-const blogImageStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'blog_images',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif'],
-    public_id: (req, file) => `blog_${Date.now()}-${file.originalname}`,
-  },
-});
-
-// Blog content images storage setup (for images uploaded in Tiptap editor)
-const blogContentStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: 'blog_content',
-    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif'],
-    public_id: (req, file) => `blog_content_${Date.now()}-${file.originalname}`,
-  },
-});
-
-export const uploadImage = multer({ storage: imageStorage });
-export const uploadDocument = multer({ storage: documentStorage });
-export const uploadBlogImage = multer({ storage: blogImageStorage });
-export const uploadBlogContent = multer({ 
-  storage: blogContentStorage,
+// ✅ Fixed: Create separate upload instances for different field configurations
+export const uploadCollegeImages = multer({
+  storage: createCollegeStorage(),
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 5 * 1024 * 1024, // 5MB per file
   },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
@@ -72,5 +43,59 @@ export const uploadBlogContent = multer({
   }
 });
 
-// ✅ Proper export of cloudinary instance
+// For single image upload (backward compatibility)
+export const uploadImage = multer({ 
+  storage: createCollegeStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  }
+});
+
+// Document storage
+const documentStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'college_documents',
+    allowed_formats: ['pdf', 'jpg', 'png', 'jpeg', 'webp', 'avif'],
+    resource_type: 'auto',
+    public_id: (req, file) => `${Date.now()}-${file.originalname}`,
+  },
+});
+
+// Blog image storage
+const blogImageStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'blog_images',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif'],
+    public_id: (req, file) => `blog_${Date.now()}-${file.originalname}`,
+  },
+});
+
+// Blog content storage
+const blogContentStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'blog_content',
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp', 'avif'],
+    public_id: (req, file) => `blog_content_${Date.now()}-${file.originalname}`,
+  },
+});
+
+export const uploadDocument = multer({ storage: documentStorage });
+export const uploadBlogImage = multer({ storage: blogImageStorage });
+export const uploadBlogContent = multer({ 
+  storage: blogContentStorage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only image files are allowed!'), false);
+    }
+  }
+});
+
 export { cloudinary };
