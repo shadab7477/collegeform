@@ -42,7 +42,7 @@ export const addCollege = async (req, res) => {
 
     const {
       name, location, description, shortDescription, minFees, maxFees, avgPackage,
-      exams, courses, specializations, collegeType, category, rating, isTopCollege,
+      exams, courses, specializations, collegeType, category, rating, isTopCollege,isRequestcallback,
       coursePricing, admissionProcess, importantDates, applicationDeadline,
       entranceExams, placementCompanies, placementHighlights, keyHighlights, requiredDocuments
     } = req.body;
@@ -76,6 +76,8 @@ export const addCollege = async (req, res) => {
       category: category?.trim() || "Default",
       rating: parseNumberField(rating),
       isTopCollege: parseBooleanField(isTopCollege),
+      isRequestcallback: parseBooleanField(isRequestcallback),
+
       image: imageUrl,
       imagePublicId,
       additionalImages,
@@ -145,7 +147,7 @@ export const editCollege = async (req, res) => {
 
     const {
       name, location, description, shortDescription, minFees, maxFees, avgPackage,
-      exams, courses, specializations, collegeType, category, rating, isTopCollege,
+      exams, courses, specializations, collegeType, category, rating, isTopCollege,isRequestcallback,
       coursePricing, admissionProcess, importantDates, applicationDeadline,
       entranceExams, placementCompanies, placementHighlights, keyHighlights, requiredDocuments
     } = req.body;
@@ -165,6 +167,8 @@ export const editCollege = async (req, res) => {
     college.category = category?.trim() || college.category;
     college.rating = parseNumberField(rating, college.rating);
     college.isTopCollege = parseBooleanField(isTopCollege, college.isTopCollege);
+    college.isRequestcallback = parseBooleanField(isRequestcallback, college.isRequestcallback);
+
     college.applicationDeadline = applicationDeadline || college.applicationDeadline;
     college.entranceExams = parseJSONField(entranceExams, college.entranceExams);
     college.placementHighlights = parseJSONField(placementHighlights, college.placementHighlights);

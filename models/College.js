@@ -64,6 +64,7 @@ const collegeSchema = new mongoose.Schema(
     collegeType: [{ type: String }],
     category: { type: String, default: "Default" },
     isTopCollege: { type: Boolean, default: false },
+    isRequestcallback: { type: Boolean, default: false },
     
     // Image fields
     image: { type: String, required: true },
