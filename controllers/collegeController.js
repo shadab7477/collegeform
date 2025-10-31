@@ -251,7 +251,7 @@ export const getColleges = async (req, res) => {
 export const getCollegeById = async (req, res) => {
   try {
     const { id } = req.params;
-    const data = await College.findById(id);
+    const college = await College.findById(id);
     
     if (!college) {
       return res.status(404).json({ 
@@ -261,7 +261,7 @@ export const getCollegeById = async (req, res) => {
     }
     
     res.json(
-      data
+      college
     );
   } catch (error) {
     console.error('Error fetching college:', error);
