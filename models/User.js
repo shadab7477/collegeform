@@ -1,3 +1,4 @@
+// models/User.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
@@ -7,16 +8,14 @@ const userSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true,
-        unique: true,
+        required: false, // Make email optional
     },
     phone: {
         type: String,
-    },
-    password: {
-        type: String,
         required: true,
+        unique: true,
     },
+    // Remove password field completely
     city: {
         type: String,
         required: false
@@ -60,15 +59,6 @@ const userSchema = new mongoose.Schema({
         default: false
     },
     lastOtpSent: {
-        type: Date,
-        default: null
-    },
-    // Password reset fields
-    resetPasswordToken: {
-        type: String,
-        default: null
-    },
-    resetPasswordExpires: {
         type: Date,
         default: null
     }
